@@ -30,8 +30,8 @@ from iopaint.const import *
 _config_file: Path = None
 
 default_configs = dict(
-    host="127.0.0.1",
-    port=8080,
+    host="0.0.0.0",
+    port=os.getenv("PORT"),
     inbrowser=True,
     model=DEFAULT_MODEL,
     model_dir=DEFAULT_MODEL_DIR,

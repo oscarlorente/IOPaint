@@ -179,6 +179,10 @@ def start(
 
     app = FastAPI(lifespan=lifespan)
 
+    import os
+    host = "0.0.0.0"
+    port = os.getenv("PORT")
+
     api_config = ApiConfig(
         host=host,
         port=port,

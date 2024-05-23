@@ -3,9 +3,7 @@ import io from "socket.io-client"
 import { Progress } from "./ui/progress"
 import { useStore } from "@/lib/states"
 
-export const API_ENDPOINT = import.meta.env.DEV
-  ? import.meta.env.VITE_BACKEND
-  : ""
+export const API_ENDPOINT = ""
 const socket = io(API_ENDPOINT)
 
 const DiffusionProgress = () => {
