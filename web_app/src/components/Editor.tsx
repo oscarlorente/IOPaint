@@ -21,14 +21,13 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand, Download } from "lucide-react"
+import { Eraser, Eye, Redo, Undo, Expand, Download, RotateCw } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
 import { useStore } from "@/lib/states"
 import Cropper from "./Cropper"
 import { InteractiveSegPoints } from "./InteractiveSeg"
-import useHotKey from "@/hooks/useHotkey"
 import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
 
@@ -65,6 +64,8 @@ export default function Editor(props: EditorProps) {
     updateAppState,
     runMannually,
     runInpainting,
+    showPrevMask,
+    hidePrevMask,
     isCropperExtenderResizing,
     decreaseBaseBrushSize,
     increaseBaseBrushSize,
@@ -90,6 +91,8 @@ export default function Editor(props: EditorProps) {
     state.updateAppState,
     state.runMannually(),
     state.runInpainting,
+    state.showPrevMask,
+    state.hidePrevMask,
     state.isCropperExtenderResizing,
     state.decreaseBaseBrushSize,
     state.increaseBaseBrushSize,
@@ -245,7 +248,7 @@ export default function Editor(props: EditorProps) {
     }
 
     const rW = windowSize.width / width
-    const rH = (windowSize.height - TOOLBAR_HEIGHT) / height
+    const rH = windowSize.height / height
 
     let s = 1.0
     if (rW < 1 || rH < 1) {
@@ -341,13 +344,6 @@ export default function Editor(props: EditorProps) {
     }
   }
 
-  useHotKey("Escape", handleEscPressed, [
-    isDraging,
-    isInpainting,
-    resetZoom,
-    // drawOnCurrentRender,
-  ])
-
   const onMouseMove = (ev: SyntheticEvent) => {
     const mouseEvent = ev.nativeEvent as MouseEvent
     setCoords({ x: mouseEvent.pageX, y: mouseEvent.pageY })
@@ -428,11 +424,7 @@ export default function Editor(props: EditorProps) {
       return
     }
 
-    if (runMannually) {
-      setIsDraging(false)
-    } else {
-      runInpainting()
-    }
+    setIsDraging(false)
   }
 
   const onCanvasMouseUp = (ev: SyntheticEvent) => {
@@ -484,41 +476,11 @@ export default function Editor(props: EditorProps) {
     keyboardEvent.preventDefault()
     undo()
   }
-  useHotKey("meta+z,ctrl+z", handleUndo)
 
   const handleRedo = (keyboardEvent: KeyboardEvent | SyntheticEvent) => {
     keyboardEvent.preventDefault()
     redo()
   }
-  useHotKey("shift+ctrl+z,shift+meta+z", handleRedo)
-
-  useKeyPressEvent(
-    "Tab",
-    (ev) => {
-      ev?.preventDefault()
-      ev?.stopPropagation()
-      if (hadRunInpainting()) {
-        setShowOriginal(() => {
-          window.setTimeout(() => {
-            setSliderPos(100)
-          }, 10)
-          return true
-        })
-      }
-    },
-    (ev) => {
-      ev?.preventDefault()
-      ev?.stopPropagation()
-      if (hadRunInpainting()) {
-        window.setTimeout(() => {
-          setSliderPos(0)
-        }, 10)
-        window.setTimeout(() => {
-          setShowOriginal(false)
-        }, COMPARE_SLIDER_DURATION_MS)
-      }
-    }
-  )
 
   const download = useCallback(async () => {
     if (file === undefined) {
@@ -572,8 +534,6 @@ export default function Editor(props: EditorProps) {
     lineGroups,
   ])
 
-  useHotKey("meta+s,ctrl+s", download)
-
   const toggleShowBrush = (newState: boolean) => {
     if (newState !== showBrush && !isPanning && !isCropperExtenderResizing) {
       setShowBrush(newState)
@@ -592,88 +552,6 @@ export default function Editor(props: EditorProps) {
     }
     return undefined
   }, [showBrush, isPanning, isProcessing])
-
-  useHotKey(
-    "[",
-    () => {
-      decreaseBaseBrushSize()
-    },
-    [decreaseBaseBrushSize]
-  )
-
-  useHotKey(
-    "]",
-    () => {
-      increaseBaseBrushSize()
-    },
-    [increaseBaseBrushSize]
-  )
-
-  // Manual Inpainting Hotkey
-  useHotKey(
-    "shift+r",
-    () => {
-      if (runMannually && hadDrawSomething()) {
-        runInpainting()
-      }
-    },
-    [runMannually, runInpainting, hadDrawSomething]
-  )
-
-  useHotKey(
-    "ctrl+c,meta+c",
-    async () => {
-      const hasPermission = await askWritePermission()
-      if (hasPermission && renders.length > 0) {
-        if (context?.canvas) {
-          await copyCanvasImage(context?.canvas)
-          toast({
-            title: "Copy inpainting result to clipboard",
-          })
-        }
-      }
-    },
-    [renders, context]
-  )
-
-  // Toggle clean/zoom tool on spacebar.
-  useKeyPressEvent(
-    " ",
-    (ev) => {
-      if (!disableShortCuts) {
-        ev?.preventDefault()
-        ev?.stopPropagation()
-        setShowBrush(false)
-        setIsPanning(true)
-      }
-    },
-    (ev) => {
-      if (!disableShortCuts) {
-        ev?.preventDefault()
-        ev?.stopPropagation()
-        setShowBrush(true)
-        setIsPanning(false)
-      }
-    }
-  )
-
-  useKeyPressEvent(
-    "Alt",
-    (ev) => {
-      if (!disableShortCuts) {
-        ev?.preventDefault()
-        ev?.stopPropagation()
-        setIsChangingBrushSizeByWheel(true)
-      }
-    },
-    (ev) => {
-      if (!disableShortCuts) {
-        ev?.preventDefault()
-        ev?.stopPropagation()
-        setIsChangingBrushSizeByWheel(false)
-      }
-    }
-  )
 
   const getCurScale = (): number => {
     let s = minScale
@@ -729,6 +607,18 @@ export default function Editor(props: EditorProps) {
     )
   }
 
+  const handleRerunLastMask = () => {
+    runInpainting()
+  }
+
+  const onRerunMouseEnter = () => {
+    showPrevMask()
+  }
+
+  const onRerunMouseLeave = () => {
+    hidePrevMask()
+  }
+
   const renderCanvas = () => {
     return (
       <TransformWrapper
@@ -742,10 +632,10 @@ export default function Editor(props: EditorProps) {
         centerZoomedOut
         alignmentAnimation={{ disabled: true }}
         centerOnInit
-        limitToBounds={false}
+        limitToBounds={true}
         doubleClick={{ disabled: true }}
         initialScale={minScale}
-        minScale={minScale * 0.3}
+        minScale={minScale}
         onPanning={() => {
           if (!panned) {
             setPanned(true)
@@ -764,8 +654,6 @@ export default function Editor(props: EditorProps) {
             <canvas
               className="[grid-area:editor-content]"
               style={{
-                clipPath: `inset(0 ${sliderPos}% 0 0)`,
-                transition: `clip-path ${COMPARE_SLIDER_DURATION_MS}ms`,
               }}
               ref={(r) => {
                 if (r && !imageContext) {
@@ -785,8 +673,6 @@ export default function Editor(props: EditorProps) {
               )}
               style={{
                 cursor: getCursor(),
-                clipPath: `inset(0 ${sliderPos}% 0 0)`,
-                transition: `clip-path ${COMPARE_SLIDER_DURATION_MS}ms`,
               }}
               onContextMenu={(e) => {
                 e.preventDefault()
@@ -818,13 +704,6 @@ export default function Editor(props: EditorProps) {
             >
               {showOriginal && (
                 <>
-                  <div
-                    className="[grid-area:original-image-content] z-10 bg-primary h-full w-[6px] justify-self-end"
-                    style={{
-                      marginRight: `${sliderPos}%`,
-                      transition: `margin-right ${COMPARE_SLIDER_DURATION_MS}ms`,
-                    }}
-                  />
                   <img
                     className="[grid-area:original-image-content]"
                     src={original.src}
@@ -913,7 +792,7 @@ export default function Editor(props: EditorProps) {
         />
         <div className="flex gap-2">
           <IconButton
-            tooltip="Reset zoom & pan"
+            tooltip="Reset zoom"
             disabled={scale === minScale && panned === false}
             onClick={resetZoom}
           >
@@ -933,56 +812,43 @@ export default function Editor(props: EditorProps) {
           >
             <Redo />
           </IconButton>
+
+          <IconButton
+            disabled={isInpainting || !renders.length}
+            tooltip="Rerun previous mask"
+            onClick={handleRerunLastMask}
+            onMouseEnter={onRerunMouseEnter}
+            onMouseLeave={onRerunMouseLeave}
+          >
+            <RotateCw />
+          </IconButton>
+
           <IconButton
             tooltip="Show original image"
             onPointerDown={(ev) => {
               ev.preventDefault()
-              setShowOriginal(() => {
-                window.setTimeout(() => {
-                  setSliderPos(100)
-                }, 10)
-                return true
-              })
+              setShowOriginal(true)
             }}
             onPointerUp={() => {
-              window.setTimeout(() => {
-                // 防止快速点击 show original image 按钮时图片消失
-                setSliderPos(0)
-              }, 10)
-
-              window.setTimeout(() => {
-                setShowOriginal(false)
-              }, COMPARE_SLIDER_DURATION_MS)
+              setShowOriginal(false)
             }}
             disabled={renders.length === 0}
           >
             <Eye />
           </IconButton>
-          <IconButton
-            tooltip="Save Image"
-            disabled={!renders.length}
-            onClick={download}
-          >
-            <Download />
-          </IconButton>
 
-          {settings.enableManualInpainting &&
-          settings.model.model_type === "inpaint" ? (
-            <IconButton
-              tooltip="Run Inpainting"
-              disabled={
-                isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
-              }
-              onClick={() => {
-                runInpainting()
-              }}
-            >
-              <Eraser />
-            </IconButton>
-          ) : (
-            <></>
-          )}
-        </div>
+          <IconButton
+            tooltip="Run Inpainting"
+            disabled={
+              isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
+            }
+            onClick={() => {
+              runInpainting()
+            }}
+          >
+            <Eraser />
+          </IconButton>
+      </div>
       </div>
     </div>
   )

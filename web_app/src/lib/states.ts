@@ -330,7 +330,7 @@ const defaultValues: AppState = {
     showExtender: false,
     extenderDirection: ExtenderDirection.xy,
     enableDownloadMask: false,
-    enableManualInpainting: false,
+    enableManualInpainting: true,
     enableUploadMask: false,
     enableAutoExtractPrompt: true,
     ldmSteps: 30,

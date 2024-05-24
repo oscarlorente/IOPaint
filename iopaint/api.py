@@ -63,9 +63,18 @@ from iopaint.schema import (
     RealESRGANModel,
 )
 
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv(filename=".env.local"))
+
+import boto3
+from botocore.exceptions import ClientError
+
 CURRENT_DIR = Path(__file__).parent.absolute().resolve()
 WEB_APP_DIR = CURRENT_DIR / "web_app"
 
+TOUR_KEY_PATH_PREFIX = (
+    'img/properties/{agency_id}/{tour_id}/simpleimages/'
+)
 
 def api_middleware(app: FastAPI):
     rich_available = False
@@ -157,11 +166,17 @@ class Api:
         self.plugins = self._build_plugins()
         self.model_manager = self._build_model_manager()
 
+        self.s3_resource = boto3.resource('s3')
+        self.bucket_name = os.environ["AWS_S3_NAME"]
+        self.img_dir = './tmp_img'
+        os.makedirs(self.img_dir, exist_ok=True)
+
         # fmt: off
         self.add_api_route("/api/v1/gen-info", self.api_geninfo, methods=["POST"], response_model=GenInfoResponse)
         self.add_api_route("/api/v1/server-config", self.api_server_config, methods=["GET"], response_model=ServerConfigResponse)
         self.add_api_route("/api/v1/model", self.api_current_model, methods=["GET"], response_model=ModelInfo)
         self.add_api_route("/api/v1/model", self.api_switch_model, methods=["POST"], response_model=ModelInfo)
+        self.add_api_route("/api/v1/get_image_from_s3", self.api_get_image_from_s3, methods=["GET"])
         self.add_api_route("/api/v1/inputimage", self.api_input_image, methods=["GET"])
         self.add_api_route("/api/v1/inpaint", self.api_inpaint, methods=["POST"])
         self.add_api_route("/api/v1/switch_plugin_model", self.api_switch_plugin_model, methods=["POST"])
@@ -170,7 +185,7 @@ class Api:
         self.add_api_route("/api/v1/samplers", self.api_samplers, methods=["GET"])
         self.add_api_route("/api/v1/adjust_mask", self.api_adjust_mask, methods=["POST"])
         self.add_api_route("/api/v1/save_image", self.api_save_image, methods=["POST"])
-        self.app.mount("/", StaticFiles(directory=WEB_APP_DIR, html=True), name="assets")
+        # self.app.mount("/", StaticFiles(directory=WEB_APP_DIR, html=True), name="assets")
         # fmt: on
 
         global global_sio
@@ -236,6 +251,24 @@ class Api:
             isDesktop=False,
             samplers=self.api_samplers(),
         )
+
+    def api_get_image_from_s3(self, agencyId: str, tourId: str, imageId: str) -> FileResponse:
+        prefix_path = TOUR_KEY_PATH_PREFIX.format(
+            agency_id=agencyId,
+            tour_id=tourId
+        )
+        img_key = prefix_path + imageId
+        img_path = os.path.join(self.img_dir, imageId)
+        try:
+            self.s3_resource.meta.client.download_file(
+                Bucket=self.bucket_name,
+                Key=img_key,
+                Filename=img_path
+            )
+
+            return FileResponse(img_path)
+        except ClientError as e:
+            raise HTTPException(status_code=404, detail=f"Error downloading image from s3: {e}")
 
     def api_input_image(self) -> FileResponse:
         if self.config.input and self.config.input.is_file():

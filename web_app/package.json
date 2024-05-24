@@ -49,6 +49,7 @@
     "react-hook-form": "^7.48.2",
     "react-hotkeys-hook": "^4.4.1",
     "react-photo-album": "^2.3.0",
+    "react-router-dom": "^6.23.1",
     "react-use": "^17.4.0",
     "react-zoom-pan-pinch": "^3.3.0",
     "recoil": "^0.7.7",
