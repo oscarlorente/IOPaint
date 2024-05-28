@@ -6,22 +6,17 @@ import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch"
-import { useKeyPressEvent } from "react-use"
-import { downloadToOutput, runPlugin } from "@/lib/api"
+import { runPlugin } from "@/lib/api"
 import { IconButton } from "@/components/ui/button"
 import {
-  askWritePermission,
   cn,
-  copyCanvasImage,
-  downloadImage,
   drawLines,
-  generateMask,
   isMidClick,
   isRightClick,
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand, Download, RotateCw } from "lucide-react"
+import { Eraser, Eye, Redo, Undo, Expand, RotateCw } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
@@ -30,9 +25,6 @@ import Cropper from "./Cropper"
 import { InteractiveSegPoints } from "./InteractiveSeg"
 import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
-
-const TOOLBAR_HEIGHT = 200
-const COMPARE_SLIDER_DURATION_MS = 300
 
 interface EditorProps {
   file: File
@@ -43,13 +35,11 @@ export default function Editor(props: EditorProps) {
   const { toast } = useToast()
 
   const [
-    disableShortCuts,
     windowSize,
     isInpainting,
     imageWidth,
     imageHeight,
     settings,
-    enableAutoSaving,
     setImageSize,
     setBaseBrushSize,
     interactiveSegState,
@@ -62,7 +52,6 @@ export default function Editor(props: EditorProps) {
     redoDisabled,
     isProcessing,
     updateAppState,
-    runMannually,
     runInpainting,
     showPrevMask,
     hidePrevMask,
@@ -70,13 +59,11 @@ export default function Editor(props: EditorProps) {
     decreaseBaseBrushSize,
     increaseBaseBrushSize,
   ] = useStore((state) => [
-    state.disableShortCuts,
     state.windowSize,
     state.isInpainting,
     state.imageWidth,
     state.imageHeight,
     state.settings,
-    state.serverConfig.enableAutoSaving,
     state.setImageSize,
     state.setBaseBrushSize,
     state.interactiveSegState,
@@ -89,7 +76,6 @@ export default function Editor(props: EditorProps) {
     state.redoDisabled(),
     state.getIsProcessing(),
     state.updateAppState,
-    state.runMannually(),
     state.runInpainting,
     state.showPrevMask,
     state.hidePrevMask,
@@ -102,7 +88,6 @@ export default function Editor(props: EditorProps) {
   const renders = useStore((state) => state.editorState.renders)
   const extraMasks = useStore((state) => state.editorState.extraMasks)
   const temporaryMasks = useStore((state) => state.editorState.temporaryMasks)
-  const lineGroups = useStore((state) => state.editorState.lineGroups)
   const curLineGroup = useStore((state) => state.editorState.curLineGroup)
 
   // Local State
@@ -125,10 +110,6 @@ export default function Editor(props: EditorProps) {
   const [initialCentered, setInitialCentered] = useState(false)
 
   const [isDraging, setIsDraging] = useState(false)
-
-  const [sliderPos, setSliderPos] = useState<number>(0)
-  const [isChangingBrushSizeByWheel, setIsChangingBrushSizeByWheel] =
-    useState<boolean>(false)
 
   const hadDrawSomething = useCallback(() => {
     return curLineGroup.length !== 0
@@ -214,10 +195,6 @@ export default function Editor(props: EditorProps) {
     }
     return targetFile
   }, [file, renders])
-
-  const hadRunInpainting = () => {
-    return renders.length !== 0
-  }
 
   const getCurrentWidthHeight = useCallback(() => {
     let width = 512
@@ -331,18 +308,6 @@ export default function Editor(props: EditorProps) {
       })
     }
   }, [windowSize, resetZoom])
-
-  const handleEscPressed = () => {
-    if (isProcessing) {
-      return
-    }
-
-    if (isDraging) {
-      setIsDraging(false)
-    } else {
-      resetZoom()
-    }
-  }
 
   const onMouseMove = (ev: SyntheticEvent) => {
     const mouseEvent = ev.nativeEvent as MouseEvent
@@ -482,58 +447,6 @@ export default function Editor(props: EditorProps) {
     redo()
   }
 
-  const download = useCallback(async () => {
-    if (file === undefined) {
-      return
-    }
-    if (enableAutoSaving && renders.length > 0) {
-      try {
-        await downloadToOutput(
-          renders[renders.length - 1],
-          file.name,
-          file.type
-        )
-        toast({
-          description: "Save image success",
-        })
-      } catch (e: any) {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: e.message ? e.message : e.toString(),
-        })
-      }
-      return
-    }
-
-    // TODO: download to output directory
-    const name = file.name.replace(/(\.[\w\d_-]+)$/i, "_cleanup$1")
-    const curRender = renders[renders.length - 1]
-    downloadImage(curRender.currentSrc, name)
-    if (settings.enableDownloadMask) {
-      let maskFileName = file.name.replace(/(\.[\w\d_-]+)$/i, "_mask$1")
-      maskFileName = maskFileName.replace(/\.[^/.]+$/, ".jpg")
-
-      const maskCanvas = generateMask(imageWidth, imageHeight, lineGroups)
-      // Create a link
-      const aDownloadLink = document.createElement("a")
-      // Add the name of the file to the link
-      aDownloadLink.download = maskFileName
-      // Attach the data to the link
-      aDownloadLink.href = maskCanvas.toDataURL("image/jpeg")
-      // Get the code to click the download link
-      aDownloadLink.click()
-    }
-  }, [
-    file,
-    enableAutoSaving,
-    renders,
-    settings,
-    imageHeight,
-    imageWidth,
-    lineGroups,
-  ])
-
   const toggleShowBrush = (newState: boolean) => {
     if (newState !== showBrush && !isPanning && !isCropperExtenderResizing) {
       setShowBrush(newState)
@@ -628,7 +541,7 @@ export default function Editor(props: EditorProps) {
           }
         }}
         panning={{ disabled: !isPanning, velocityDisabled: true }}
-        wheel={{ step: 0.05, wheelDisabled: isChangingBrushSizeByWheel }}
+        wheel={{ step: 0.05, wheelDisabled: false }}
         centerZoomedOut
         alignmentAnimation={{ disabled: true }}
         centerOnInit
@@ -747,7 +660,7 @@ export default function Editor(props: EditorProps) {
   const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
     // deltaY 是垂直滚动增量，正值表示向下滚动，负值表示向上滚动
     // deltaX 是水平滚动增量，正值表示向右滚动，负值表示向左滚动
-    if (!isChangingBrushSizeByWheel) {
+    if (true) {
       return
     }
 
