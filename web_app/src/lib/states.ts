@@ -252,7 +252,7 @@ const defaultValues: AppState = {
   },
   editorState: {
     baseBrushSize: DEFAULT_BRUSH_SIZE,
-    brushSizeScale: 1,
+    brushSizeScale: 5.90,
     renders: [],
     extraMasks: [],
     prevExtraMasks: [],

@@ -17,15 +17,15 @@ function Home() {
 
   const [searchParams] = useSearchParams()
   const [params, setParams] = useState({
-    agencyId: searchParams.get("agency_id")!,
-    tourId: searchParams.get("tour_id")!,
-    imageId: searchParams.get("image_id")!
+    agencyId: searchParams.get("agencyId")!,
+    tourId: searchParams.get("tourId")!,
+    imageId: searchParams.get("imageId")!
   });
 
   useEffect(() => {
-    const agencyId = searchParams.get("agency_id")!;
-    const tourId = searchParams.get("tour_id")!;
-    const imageId = searchParams.get("image_id")!;
+    const agencyId = searchParams.get("agencyId")!;
+    const tourId = searchParams.get("tourId")!;
+    const imageId = searchParams.get("imageId")!;
   
     setParams({ agencyId, tourId, imageId });
   }, [searchParams]);
