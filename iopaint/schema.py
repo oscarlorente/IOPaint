@@ -232,6 +232,7 @@ class ApiConfig(BaseModel):
     port: int
     inbrowser: bool
     model: str
+    inpaint_realesrgan: bool
     no_half: bool
     low_mem: bool
     cpu_offload: bool
@@ -425,7 +426,7 @@ class InpaintRequest(BaseModel):
 
 class RunPluginRequest(BaseModel):
     name: str
-    image: str = Field(..., description="base64 encoded image")
+    image: str = Field(None, description="base64 encoded image")
     clicks: List[List[int]] = Field(
         [], description="Clicks for interactive seg, [[x,y,0/1], [x2,y2,0/1]]"
     )
