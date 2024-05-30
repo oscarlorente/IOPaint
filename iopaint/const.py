@@ -34,6 +34,10 @@ DIFFUSION_MODELS = [
     ANYTEXT_NAME,
 ]
 
+INPAINT_REALESRGAN_HELP = """
+Use realesrgan to upscale inpainting result.
+"""
+
 NO_HALF_HELP = """
 Using full precision(fp32) model.
 If your diffusion model generate result is always black or green, use this argument.

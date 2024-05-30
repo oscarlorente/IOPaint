@@ -420,6 +420,7 @@ class Api:
         return ModelManager(
             name=self.config.model,
             device=torch.device(self.config.device),
+            inpaint_realesrgan=self.config.inpaint_realesrgan,
             no_half=self.config.no_half,
             low_mem=self.config.low_mem,
             disable_nsfw=self.config.disable_nsfw_checker,

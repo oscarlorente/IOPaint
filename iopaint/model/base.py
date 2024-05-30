@@ -5,16 +5,19 @@ import cv2
 import torch
 import numpy as np
 from loguru import logger
+from PIL import Image
 
 from iopaint.helper import (
     boxes_from_mask,
     resize_max_size,
     pad_img_to_modulo,
     switch_mps_device,
+    encode_pil_to_base64,
 )
-from iopaint.schema import InpaintRequest, HDStrategy, SDSampler
+from iopaint.schema import InpaintRequest, HDStrategy, SDSampler, RunPluginRequest
 from .helper.g_diffuser_bot import expand_image
 from .utils import get_scheduler
+from iopaint.plugins.realesrgan import RealESRGANUpscaler
 
 
 class InpaintModel:
@@ -33,6 +36,17 @@ class InpaintModel:
         device = switch_mps_device(self.name, device)
         self.device = device
         self.init_model(device, **kwargs)
+
+        self.upscale_inpainting_realesrgan = kwargs.get("inpaint_realesrgan")
+        if self.upscale_inpainting_realesrgan:
+            logger.info(
+                f"Initialize {RealESRGANUpscaler.name} to upscale inpainting"
+            )
+            self.realesrgan_model = RealESRGANUpscaler(
+                'realesr-general-x4v3',
+                'cuda',
+                no_half=False,
+            )
 
     @abc.abstractmethod
     def init_model(self, device, **kwargs): ...
@@ -90,6 +104,7 @@ class InpaintModel:
         masks: [H, W]
         return: BGR IMAGE
         """
+
         inpaint_result = None
         # logger.info(f"hd_strategy: {config.hd_strategy}")
         if config.hd_strategy == HDStrategy.CROP:
@@ -122,6 +137,9 @@ class InpaintModel:
                 inpaint_result = self._pad_forward(
                     downsize_image, downsize_mask, config
                 )
+                
+                if self.upscale_inpainting_realesrgan:
+                    inpaint_result = self.realesrgan_model.gen_image(inpaint_result.astype("uint8")[:,:,::-1], RunPluginRequest(name=RealESRGANUpscaler.name, scale=2))
 
                 # only paste masked area result
                 inpaint_result = cv2.resize(
