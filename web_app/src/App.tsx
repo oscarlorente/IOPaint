@@ -8,8 +8,7 @@ import { useStore } from "./lib/states"
 import { useWindowSize } from "react-use"
 
 function Home() {
-  const [file, updateAppState, setServerConfig, setFile] = useStore((state) => [
-    state.file,
+  const [updateAppState, setServerConfig, setFile] = useStore((state) => [
     state.updateAppState,
     state.setServerConfig,
     state.setFile,
