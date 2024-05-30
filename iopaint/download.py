@@ -187,7 +187,6 @@ def scan_inpaint_models(model_dir: Path) -> List[ModelInfo]:
     from iopaint.model import models
 
     # logger.info(f"Scanning inpaint models in {model_dir}")
-
     for name, m in models.items():
         if m.is_erase_model and m.is_downloaded():
             res.append(

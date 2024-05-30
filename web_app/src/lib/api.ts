@@ -10,7 +10,7 @@ import { Settings } from "@/lib/states"
 import { convertToBase64, srcToFile } from "@/lib/utils"
 import axios from "axios"
 
-export const API_ENDPOINT = "http://127.0.0.1:8080/api/v1"
+export const API_ENDPOINT = "https://499cf5835d8b0c.lhr.life/api/v1"
 
 const api = axios.create({
   baseURL: API_ENDPOINT,
@@ -43,10 +43,10 @@ export default async function inpaint(
       zits_wireframe: settings.zitsWireframe,
       cv2_flag: settings.cv2Flag,
       cv2_radius: settings.cv2Radius,
-      hd_strategy: "Crop",
+      hd_strategy: "Resize",
       hd_strategy_crop_triger_size: 640,
       hd_strategy_crop_margin: 128,
-      hd_trategy_resize_imit: 2048,
+      hd_strategy_resize_limit: 2048,
       prompt: settings.prompt,
       negative_prompt: settings.negativePrompt,
       use_croper: settings.showCropper,
