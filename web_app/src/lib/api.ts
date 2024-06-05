@@ -10,7 +10,7 @@ import { Settings } from "@/lib/states"
 import { convertToBase64, srcToFile } from "@/lib/utils"
 import axios from "axios"
 
-export const API_ENDPOINT = "https://836326486b3664.lhr.life/api/v1"
+export const API_ENDPOINT = "https://1b77bf6eb63392.lhr.life/api/v1"
 
 const api = axios.create({
   baseURL: API_ENDPOINT,
