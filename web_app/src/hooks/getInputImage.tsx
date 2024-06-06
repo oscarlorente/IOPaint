@@ -8,6 +8,7 @@ export default function getInputImage(agencyId: string, tourId: string, imageId:
     const headers = new Headers()
     headers.append("pragma", "no-cache")
     headers.append("cache-control", "no-cache")
+    headers.append("ngrok-skip-browser-warning", "true")
 
     fetch(`${API_ENDPOINT}/get_image_from_s3?agencyId=${agencyId}&tourId=${tourId}&imageId=${imageId}`, { headers })
       .then(async (res) => {

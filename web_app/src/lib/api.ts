@@ -10,7 +10,7 @@ import { Settings } from "@/lib/states"
 import { convertToBase64, srcToFile } from "@/lib/utils"
 import axios from "axios"
 
-export const API_ENDPOINT = "https://008917a7bc987d.lhr.life/api/v1"
+export const API_ENDPOINT = "https://albacore-touched-pony.ngrok-free.app/api/v1"
 
 const api = axios.create({
   baseURL: API_ENDPOINT,
@@ -34,6 +34,7 @@ export default async function inpaint(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "true"
     },
     body: JSON.stringify({
       image: imageBase64,
