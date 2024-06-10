@@ -145,6 +145,8 @@ type AppState = {
   imageHeight: number
   imageWidth: number
   isInpainting: boolean
+  isSaving: boolean
+  isSaved: boolean
   isPluginRunning: boolean
   isAdjustingMask: boolean
   windowSize: Size
@@ -168,6 +170,8 @@ type AppAction = {
   setFile: (file: File) => Promise<void>
   setCustomFile: (file: File) => void
   setIsInpainting: (newValue: boolean) => void
+  setIsSaving: (newValue: boolean) => void
+  setIsSaved: (newValue: boolean) => void
   getIsProcessing: () => boolean
   setBaseBrushSize: (newValue: number) => void
   decreaseBaseBrushSize: () => void
@@ -242,6 +246,8 @@ const defaultValues: AppState = {
   imageHeight: 0,
   imageWidth: 0,
   isInpainting: false,
+  isSaving: false,
+  isSaved: false,
   isPluginRunning: false,
   isAdjustingMask: false,
   disableShortCuts: false,
@@ -559,6 +565,8 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
         set((state) => {
           state.isInpainting = false
           state.editorState.temporaryMasks = []
+          state.isSaved = false
+          window.parent.postMessage({ type: 'image_saved', isImageSaved: false }, '*')
         })
       },
 
@@ -661,6 +669,16 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
           get().isInpainting || get().isPluginRunning || get().isAdjustingMask
         )
       },
+
+      setIsSaving: (newValue: boolean) =>
+        set((state) => {
+          state.isSaving = newValue
+        }),
+
+      setIsSaved: (newValue: boolean) =>
+        set((state) => {
+          state.isSaved = newValue
+        }),
 
       isSD: (): boolean => {
         return get().settings.model.model_type !== MODEL_TYPE_INPAINT
