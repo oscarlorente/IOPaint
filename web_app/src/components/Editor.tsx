@@ -7,7 +7,7 @@ import {
   TransformWrapper,
 } from "react-zoom-pan-pinch"
 import { runPlugin } from "@/lib/api"
-import { IconButton } from "@/components/ui/button"
+import { Button, IconButton } from "@/components/ui/button"
 import {
   cn,
   drawLines,
@@ -16,7 +16,7 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand, RotateCw } from "lucide-react"
+import { Eraser, Eye, Redo, Undo, Expand } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
@@ -28,10 +28,15 @@ import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
 
 interface EditorProps {
   file: File
+  params: {
+    agencyId: string;
+    userToken: string;
+    imageId: string;
+  };
 }
 
 export default function Editor(props: EditorProps) {
-  const { file } = props
+  const { file, params } = props
   const { toast } = useToast()
 
   const [
@@ -53,8 +58,8 @@ export default function Editor(props: EditorProps) {
     isProcessing,
     updateAppState,
     runInpainting,
-    showPrevMask,
-    hidePrevMask,
+    // showPrevMask,
+    // hidePrevMask,
     isCropperExtenderResizing,
     decreaseBaseBrushSize,
     increaseBaseBrushSize,
@@ -99,6 +104,8 @@ export default function Editor(props: EditorProps) {
   const [showBrush, setShowBrush] = useState(false)
   const [showRefBrush, setShowRefBrush] = useState(false)
   const [isPanning, setIsPanning] = useState<boolean>(false)
+  const [isSaving, setIsSaving] = useState<boolean>(false)
+  const [isSaved, setIsSaved] = useState<boolean>(false)
 
   const [scale, setScale] = useState<number>(1)
   const [panned, setPanned] = useState<boolean>(false)
@@ -114,6 +121,58 @@ export default function Editor(props: EditorProps) {
   const hadDrawSomething = useCallback(() => {
     return curLineGroup.length !== 0
   }, [curLineGroup])
+
+  const saveChanges = async () => {
+    console.log("Save changes");
+
+    setIsSaving(true);
+    setIsSaved(false);
+    
+
+    console.log("agencyId: ", params.agencyId)
+    console.log("userToken: ", params.userToken)
+    console.log("imageId: ", params.imageId)
+    
+    // Constructing the request body
+    const formData = new FormData();
+    formData.append('image_id', params.imageId);
+    formData.append('user_token', params.userToken);
+    formData.append('image', "");
+
+    // Sending the POST request
+    fetch('/image/erased/save', {
+      method: 'POST',
+      body: formData
+    })
+      .then(response => {
+        if (response.status === 400) {
+          throw new Error('Bad request: ' + response.statusText);
+        } else if (response.status === 404) {
+          throw new Error('Resource not found: ' + response.statusText);
+        } else if (!response.ok) {
+          throw new Error('Server error: ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Check for success or other statuses
+        if (data.status === 'success') {
+          console.log('Image saved successfully');
+          setIsSaved(true);
+          window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
+
+        } else {
+          console.error('Error:', data.status);
+        }
+      })
+      .catch(error => {
+        // Handle errors here
+        console.error('There was a problem with the fetch operation:', error);
+      })
+      .finally(() => {
+        setIsSaving(false); // Reset saving state
+      });
+  };
 
   useEffect(() => {
     if (
@@ -520,17 +579,17 @@ export default function Editor(props: EditorProps) {
     )
   }
 
-  const handleRerunLastMask = () => {
-    runInpainting()
-  }
+  // const handleRerunLastMask = () => {
+  //   runInpainting()
+  // }
 
-  const onRerunMouseEnter = () => {
-    showPrevMask()
-  }
+  // const onRerunMouseEnter = () => {
+  //   showPrevMask()
+  // }
 
-  const onRerunMouseLeave = () => {
-    hidePrevMask()
-  }
+  // const onRerunMouseLeave = () => {
+  //   hidePrevMask()
+  // }
 
   const renderCanvas = () => {
     return (
@@ -675,7 +734,7 @@ export default function Editor(props: EditorProps) {
 
   return (
     <div
-      className="flex w-screen h-screen justify-center items-center"
+      className="flex items-center justify-center w-screen h-screen"
       aria-hidden="true"
       onMouseMove={onMouseMove}
       onMouseUp={onPointerUp}
@@ -702,6 +761,7 @@ export default function Editor(props: EditorProps) {
           value={[baseBrushSize]}
           onValueChange={(vals) => handleSliderChange(vals[0])}
           onClick={() => setShowRefBrush(false)}
+          disabled={isSaving}
         />
         <div className="flex gap-2">
           <IconButton
@@ -714,7 +774,7 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip="Undo"
             onClick={handleUndo}
-            disabled={undoDisabled}
+            disabled={undoDisabled || isSaving}
           >
             <Undo />
           </IconButton>
@@ -727,16 +787,6 @@ export default function Editor(props: EditorProps) {
           </IconButton>
 
           <IconButton
-            disabled={isInpainting || !renders.length}
-            tooltip="Rerun previous mask"
-            onClick={handleRerunLastMask}
-            onMouseEnter={onRerunMouseEnter}
-            onMouseLeave={onRerunMouseLeave}
-          >
-            <RotateCw />
-          </IconButton>
-
-          <IconButton
             tooltip="Show original image"
             onPointerDown={(ev) => {
               ev.preventDefault()
@@ -745,7 +795,7 @@ export default function Editor(props: EditorProps) {
             onPointerUp={() => {
               setShowOriginal(false)
             }}
-            disabled={renders.length === 0}
+            disabled={renders.length === 0 || isSaving}
           >
             <Eye />
           </IconButton>
@@ -761,6 +811,15 @@ export default function Editor(props: EditorProps) {
           >
             <Eraser />
           </IconButton>
+          
+          <Button
+            disabled={isProcessing || isSaving || isSaved || renders.length === 0}
+            onClick={() => {
+              saveChanges()
+            }}
+          >
+            Save
+          </Button>
       </div>
       </div>
     </div>
