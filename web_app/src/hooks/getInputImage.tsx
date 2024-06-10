@@ -1,7 +1,7 @@
 import { API_ENDPOINT } from "@/lib/api"
 import { useCallback, useEffect, useState } from "react"
 
-export default function getInputImage(agencyId: string, tourId: string, imageId: string) {
+export default function getInputImage(agencyId: string, tourId: string, imageName: string) {
   const [inputImage, setInputImage] = useState<File | null>(null)
 
   const fetchInputImage = useCallback(() => {
@@ -10,7 +10,7 @@ export default function getInputImage(agencyId: string, tourId: string, imageId:
     headers.append("cache-control", "no-cache")
     headers.append("ngrok-skip-browser-warning", "true")
 
-    fetch(`${API_ENDPOINT}/get_image_from_s3?agencyId=${agencyId}&tourId=${tourId}&imageId=${imageId}`, { headers })
+    fetch(`${API_ENDPOINT}/get_image_from_s3?agencyId=${agencyId}&tourId=${tourId}&imageName=${imageName}`, { headers })
       .then(async (res) => {
         if (!res.ok) {
           return
