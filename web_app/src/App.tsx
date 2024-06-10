@@ -17,19 +17,23 @@ function Home() {
   const [searchParams] = useSearchParams()
   const [params, setParams] = useState({
     agencyId: searchParams.get("agencyId")!,
+    userToken: searchParams.get("userToken")!,
     tourId: searchParams.get("tourId")!,
-    imageId: searchParams.get("imageId")!
+    imageId: searchParams.get("imageId")!,
+    imageName: searchParams.get("imageName")!
   });
 
   useEffect(() => {
     const agencyId = searchParams.get("agencyId")!;
+    const userToken = searchParams.get("userToken")!;
     const tourId = searchParams.get("tourId")!;
     const imageId = searchParams.get("imageId")!;
+    const imageName = searchParams.get("imageName")!;
   
-    setParams({ agencyId, tourId, imageId });
+    setParams({ agencyId, userToken, tourId, imageId, imageName });
   }, [searchParams]);
 
-  const userInputImage = getInputImage(params.agencyId, params.tourId, params.imageId)
+  const userInputImage = getInputImage(params.agencyId, params.tourId, params.imageName)
 
   const windowSize = useWindowSize()
 
@@ -56,7 +60,7 @@ function Home() {
   }, [])
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between w-full bg-black">
+    <main className="flex flex-col items-center justify-between w-full min-h-screen bg-black">
       <Workspace />
     </main>
   )
