@@ -146,7 +146,7 @@ type AppState = {
     tourId: '',
     imageId: '',
     imageName: ''
-  };
+  }
   paintByExampleFile: File | null
   customMask: File | null
   imageHeight: number
@@ -248,6 +248,13 @@ type AppAction = {
 
 const defaultValues: AppState = {
   file: null,
+  params: {
+    agencyId: '',
+    userToken: '',
+    tourId: '',
+    imageId: '',
+    imageName: ''
+  },
   paintByExampleFile: null,
   customMask: null,
   imageHeight: 0,
