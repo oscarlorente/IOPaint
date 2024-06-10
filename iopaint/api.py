@@ -252,13 +252,13 @@ class Api:
             samplers=self.api_samplers(),
         )
 
-    def api_get_image_from_s3(self, agencyId: str, tourId: str, imageId: str) -> FileResponse:
+    def api_get_image_from_s3(self, agencyId: str, tourId: str, imageName: str) -> FileResponse:
         prefix_path = TOUR_KEY_PATH_PREFIX.format(
             agency_id=agencyId,
             tour_id=tourId
         )
-        img_key = prefix_path + imageId
-        img_path = os.path.join(self.img_dir, imageId)
+        img_key = prefix_path + imageName
+        img_path = os.path.join(self.img_dir, imageName)
         try:
             self.s3_resource.meta.client.download_file(
                 Bucket=self.bucket_name,
