@@ -59,7 +59,7 @@ export default function Editor(props: EditorProps) {
     // hidePrevMask,
     isCropperExtenderResizing,
     decreaseBaseBrushSize,
-    increaseBaseBrushSize,
+    // increaseBaseBrushSize,
   ] = useStore((state) => [
     state.windowSize,
     state.isInpainting,
@@ -726,7 +726,7 @@ export default function Editor(props: EditorProps) {
     const { deltaY } = event
     // console.log(`水平滚动增量: ${deltaX}, 垂直滚动增量: ${deltaY}`)
     if (deltaY > 0) {
-      increaseBaseBrushSize()
+      // increaseBaseBrushSize()
     } else if (deltaY < 0) {
       decreaseBaseBrushSize()
     }
