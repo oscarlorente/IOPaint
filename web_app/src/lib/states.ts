@@ -140,6 +140,13 @@ type EditorState = {
 
 type AppState = {
   file: File | null
+  params: {
+    agencyId: '',
+    userToken: '',
+    tourId: '',
+    imageId: '',
+    imageName: ''
+  };
   paintByExampleFile: File | null
   customMask: File | null
   imageHeight: number
