@@ -25,18 +25,15 @@ import Cropper from "./Cropper"
 import { InteractiveSegPoints } from "./InteractiveSeg"
 import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
+import { useSearchParams } from "react-router-dom"
+
 
 interface EditorProps {
   file: File
-  params: {
-    agencyId: string;
-    userToken: string;
-    imageId: string;
-  };
 }
 
 export default function Editor(props: EditorProps) {
-  const { file, params } = props
+  const { file } = props
   const { toast } = useToast()
 
   const [
@@ -122,21 +119,24 @@ export default function Editor(props: EditorProps) {
     return curLineGroup.length !== 0
   }, [curLineGroup])
 
+  const [searchParams] = useSearchParams()
+
   const saveChanges = async () => {
     console.log("Save changes");
 
     setIsSaving(true);
     setIsSaved(false);
-    
 
-    console.log("agencyId: ", params.agencyId)
-    console.log("userToken: ", params.userToken)
-    console.log("imageId: ", params.imageId)
+    const imageId = searchParams.get("imageId")!;
+    const userToken = searchParams.get("userToken")!;
+
+    console.log("imageId: ", imageId)
+    console.log("userToken: ", userToken)
     
     // Constructing the request body
     const formData = new FormData();
-    formData.append('image_id', params.imageId);
-    formData.append('user_token', params.userToken);
+    formData.append('image_id', imageId);
+    formData.append('user_token', userToken);
     formData.append('image', "");
 
     // Sending the POST request

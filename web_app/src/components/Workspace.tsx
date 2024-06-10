@@ -4,9 +4,8 @@ import { currentModel } from "@/lib/api"
 import { useStore } from "@/lib/states"
 
 const Workspace = () => {
-  const [file, params, updateSettings] = useStore((state) => [
+  const [file, updateSettings] = useStore((state) => [
     state.file,
-    state.params,
     state.updateSettings,
   ])
 
@@ -20,7 +19,7 @@ const Workspace = () => {
 
   return (
     <>
-      {file ? <Editor file={file} params={params} /> : <></>}
+      {file ? <Editor file={file} /> : <></>}
     </>
   )
 }
