@@ -26,6 +26,7 @@ import { InteractiveSegPoints } from "./InteractiveSeg"
 import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
 import { useSearchParams } from "react-router-dom"
+import { useTranslation } from 'react-i18next';
 
 const TOOLBAR_HEIGHT = 200
 
@@ -36,7 +37,8 @@ interface EditorProps {
 export default function Editor(props: EditorProps) {
   const { file } = props
   const { toast } = useToast()
-
+  const { t } = useTranslation()
+  
   const [
     windowSize,
     isInpainting,
@@ -713,14 +715,21 @@ export default function Editor(props: EditorProps) {
         />
         <div className="flex gap-2">
           <IconButton
-            tooltip="Undo"
+            tooltip={t('editor.resetZoom')}
+            disabled={scale === minScale && panned === false}
+            onClick={resetZoom}
+          >
+            <Expand />
+          </IconButton>
+          <IconButton
+            tooltip={t('editor.undo')}
             onClick={handleUndo}
             disabled={undoDisabled || isSaving}
           >
             <Undo />
           </IconButton>
           <IconButton
-            tooltip="Redo"
+            tooltip={t('editor.redo')}
             onClick={handleRedo}
             disabled={redoDisabled}
           >
@@ -728,7 +737,7 @@ export default function Editor(props: EditorProps) {
           </IconButton>
 
           <IconButton
-            tooltip="Show original image"
+            tooltip={t('editor.showOriginalImage')}
             onPointerDown={(ev) => {
               ev.preventDefault()
               setShowOriginal(true)
@@ -742,7 +751,7 @@ export default function Editor(props: EditorProps) {
           </IconButton>
 
           <IconButton
-            tooltip="Run Inpainting"
+            tooltip={t('editor.deleteObject')}
             disabled={
               isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
             }
@@ -757,7 +766,7 @@ export default function Editor(props: EditorProps) {
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}
             onClick={saveChanges}
           >
-            Save
+            {t('editor.save')}
           </Button>
       </div>
       </div>

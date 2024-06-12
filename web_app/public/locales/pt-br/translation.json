@@ -1,0 +1,10 @@
+{
+    "editor": {
+        "save": "Salvar",
+        "undo": "Desfazer",
+        "redo": "Refazer",
+        "deleteObject": "Excluir objeto",
+        "showOriginalImage": "Mostrar imagem original",
+        "resetZoom": "Redefinir zoom"
+    }
+}

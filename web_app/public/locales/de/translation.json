@@ -1,0 +1,10 @@
+{
+    "editor": {
+        "save": "Speichern",
+        "undo": "Rückgängig machen",
+        "redo": "Wiederholen",
+        "deleteObject": "Objekt löschen",
+        "showOriginalImage": "Originalbild anzeigen",
+        "resetZoom": "Zoom zurücksetzen"
+    }
+}

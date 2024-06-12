@@ -7,6 +7,7 @@ import App from "./App.tsx"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { TooltipProvider } from "./components/ui/tooltip.tsx"
+import I18nInitializer from './i18n'; 
 
 const queryClient = new QueryClient()
 
@@ -14,6 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <I18nInitializer />
         <ThemeProvider defaultTheme="dark" disableTransitionOnChange>
           <TooltipProvider>
             <App />
