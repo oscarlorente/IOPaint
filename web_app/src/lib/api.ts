@@ -10,7 +10,8 @@ import { Settings } from "@/lib/states"
 import { convertToBase64, srcToFile } from "@/lib/utils"
 import axios from "axios"
 
-export const API_ENDPOINT = "https://albacore-touched-pony.ngrok-free.app/api/v1"
+// export const API_ENDPOINT = "https://albacore-touched-pony.ngrok-free.app/api/v1"
+export const API_ENDPOINT = "http://127.0.0.1:8080/api/v1"
 
 const api = axios.create({
   baseURL: API_ENDPOINT,
@@ -171,26 +172,41 @@ export async function getMedias(tab: string): Promise<Filename[]> {
   return res.data
 }
 
-export async function downloadToOutput(
+export async function saveImage(
   image: HTMLImageElement,
   filename: string,
-  mimeType: string
+  mimeType: string,
+  imageId: string,
+  userToken: string
 ) {
+
   const file = await srcToFile(image.src, filename, mimeType)
   const fd = new FormData()
-  fd.append("file", file)
+  fd.append("image_id", imageId);
+  fd.append("user_token", userToken);
+  fd.append("image", file);
 
   try {
     const res = await fetch(`${API_ENDPOINT}/save_image`, {
-      method: "POST",
+      method: 'POST',
       body: fd,
-    })
-    if (!res.ok) {
-      const errMsg = await res.text()
-      throw new Error(errMsg)
+    });
+
+    if (res.status === 400) {
+      throw new Error('Bad request: ' + res.statusText);
+    } else if (res.status === 404) {
+      throw new Error('Resource not found: ' + res.statusText);
+    } else if (!res.ok) {
+      throw new Error('Server error: ' + res.statusText);
+    }
+
+    const data = await res.json();
+
+    if (data.status !== 'success') {
+      throw new Error('Error: ' + data.status);
     }
   } catch (error) {
-    throw new Error(`Something went wrong: ${error}`)
+    throw new Error(`Something went wrong: ${error}`);
   }
 }
 

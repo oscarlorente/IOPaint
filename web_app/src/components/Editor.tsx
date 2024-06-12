@@ -6,7 +6,7 @@ import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch"
-import { runPlugin } from "@/lib/api"
+import { saveImage, runPlugin } from "@/lib/api"
 import { Button, IconButton } from "@/components/ui/button"
 import {
   cn,
@@ -27,6 +27,7 @@ import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
 import { useSearchParams } from "react-router-dom"
 
+const TOOLBAR_HEIGHT = 200
 
 interface EditorProps {
   file: File
@@ -55,11 +56,7 @@ export default function Editor(props: EditorProps) {
     isProcessing,
     updateAppState,
     runInpainting,
-    // showPrevMask,
-    // hidePrevMask,
-    isCropperExtenderResizing,
-    decreaseBaseBrushSize,
-    // increaseBaseBrushSize,
+    isCropperExtenderResizing
   ] = useStore((state) => [
     state.windowSize,
     state.isInpainting,
@@ -79,11 +76,7 @@ export default function Editor(props: EditorProps) {
     state.getIsProcessing(),
     state.updateAppState,
     state.runInpainting,
-    state.showPrevMask,
-    state.hidePrevMask,
-    state.isCropperExtenderResizing,
-    state.decreaseBaseBrushSize,
-    state.increaseBaseBrushSize,
+    state.isCropperExtenderResizing
   ])
   const baseBrushSize = useStore((state) => state.editorState.baseBrushSize)
   const brushSize = useStore((state) => state.getBrushSize())
@@ -121,58 +114,41 @@ export default function Editor(props: EditorProps) {
 
   const [searchParams] = useSearchParams()
 
-  const saveChanges = async () => {
-    console.log("Save changes");
-
+  const saveChanges = useCallback(async () => {
     setIsSaving(true);
     setIsSaved(false);
 
     const imageId = searchParams.get("imageId")!;
     const userToken = searchParams.get("userToken")!;
 
-    console.log("imageId: ", imageId)
-    console.log("userToken: ", userToken)
-    
-    // Constructing the request body
-    const formData = new FormData();
-    formData.append('image_id', imageId);
-    formData.append('user_token', userToken);
-    formData.append('image', "");
-
-    // Sending the POST request
-    fetch('/image/erased/save', {
-      method: 'POST',
-      body: formData
-    })
-      .then(response => {
-        if (response.status === 400) {
-          throw new Error('Bad request: ' + response.statusText);
-        } else if (response.status === 404) {
-          throw new Error('Resource not found: ' + response.statusText);
-        } else if (!response.ok) {
-          throw new Error('Server error: ' + response.statusText);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Check for success or other statuses
-        if (data.status === 'success') {
-          console.log('Image saved successfully');
-          setIsSaved(true);
-          window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
-
-        } else {
-          console.error('Error:', data.status);
-        }
-      })
-      .catch(error => {
-        // Handle errors here
-        console.error('There was a problem with the fetch operation:', error);
-      })
-      .finally(() => {
-        setIsSaving(false); // Reset saving state
+    try {
+      await saveImage(
+        renders[renders.length - 1],
+        file.name,
+        file.type,
+        imageId,
+        userToken
+      )
+      console.log('Image saved successfully');
+      setIsSaved(true);
+      window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
+      toast({
+        description: "Save image success",
       });
-  };
+
+    } catch (e: any) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: e.message ? e.message : e.toString(),
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [
+    file,
+    renders
+  ])
 
   useEffect(() => {
     if (
@@ -284,7 +260,8 @@ export default function Editor(props: EditorProps) {
     }
 
     const rW = windowSize.width / width
-    const rH = windowSize.height / height
+    // const rH = windowSize.height / height
+    const rH = (windowSize.height - TOOLBAR_HEIGHT) / height
 
     let s = 1.0
     if (rW < 1 || rH < 1) {
@@ -579,18 +556,6 @@ export default function Editor(props: EditorProps) {
     )
   }
 
-  // const handleRerunLastMask = () => {
-  //   runInpainting()
-  // }
-
-  // const onRerunMouseEnter = () => {
-  //   showPrevMask()
-  // }
-
-  // const onRerunMouseLeave = () => {
-  //   hidePrevMask()
-  // }
-
   const renderCanvas = () => {
     return (
       <TransformWrapper
@@ -716,29 +681,12 @@ export default function Editor(props: EditorProps) {
     )
   }
 
-  const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
-    // deltaY 是垂直滚动增量，正值表示向下滚动，负值表示向上滚动
-    // deltaX 是水平滚动增量，正值表示向右滚动，负值表示向左滚动
-    if (true) {
-      return
-    }
-
-    const { deltaY } = event
-    // console.log(`水平滚动增量: ${deltaX}, 垂直滚动增量: ${deltaY}`)
-    if (deltaY > 0) {
-      // increaseBaseBrushSize()
-    } else if (deltaY < 0) {
-      decreaseBaseBrushSize()
-    }
-  }
-
   return (
     <div
       className="flex items-center justify-center w-screen h-screen"
       aria-hidden="true"
       onMouseMove={onMouseMove}
       onMouseUp={onPointerUp}
-      onWheel={handleScroll}
     >
       {renderCanvas()}
       {showBrush &&
@@ -764,13 +712,6 @@ export default function Editor(props: EditorProps) {
           disabled={isSaving}
         />
         <div className="flex gap-2">
-          <IconButton
-            tooltip="Reset zoom"
-            disabled={scale === minScale && panned === false}
-            onClick={resetZoom}
-          >
-            <Expand />
-          </IconButton>
           <IconButton
             tooltip="Undo"
             onClick={handleUndo}
@@ -814,9 +755,7 @@ export default function Editor(props: EditorProps) {
           
           <Button
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}
-            onClick={() => {
-              saveChanges()
-            }}
+            onClick={saveChanges}
           >
             Save
           </Button>

@@ -22,7 +22,7 @@ except:
 
 import uvicorn
 from PIL import Image
-from fastapi import APIRouter, FastAPI, Request, UploadFile
+from fastapi import APIRouter, FastAPI, Request, UploadFile, File, Form
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +30,7 @@ from fastapi.responses import JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from socketio import AsyncServer
+import requests
 
 from iopaint.file_manager import FileManager
 from iopaint.helper import (
@@ -75,6 +76,17 @@ WEB_APP_DIR = CURRENT_DIR / "web_app"
 TOUR_KEY_PATH_PREFIX = (
     'img/properties/{agency_id}/{tour_id}/simpleimages/'
 )
+
+APP_ENV = os.environ.get("APP_ENV", "staging")
+ERASER_IMAGE_SAVE = '/image/erased/save'
+if APP_ENV == "prod":
+    FLOORFY_ERASER_SAVE_EDNPOINT = \
+        "https://floorfy.com" + ERASER_IMAGE_SAVE
+else:
+    FLOORFY_ERASER_SAVE_EDNPOINT = \
+        "https://1643-create-lightgallery-plugin-to-access-to-new-photo-eraser.agency.floorfy.com" + ERASER_IMAGE_SAVE
+
+    # "https://staging.floorfy.com" + ERASER_IMAGE_SAVE
 
 def api_middleware(app: FastAPI):
     rich_available = False
@@ -185,7 +197,6 @@ class Api:
         self.add_api_route("/api/v1/samplers", self.api_samplers, methods=["GET"])
         self.add_api_route("/api/v1/adjust_mask", self.api_adjust_mask, methods=["POST"])
         self.add_api_route("/api/v1/save_image", self.api_save_image, methods=["POST"])
-        # self.app.mount("/", StaticFiles(directory=WEB_APP_DIR, html=True), name="assets")
         # fmt: on
 
         global global_sio
@@ -196,12 +207,33 @@ class Api:
 
     def add_api_route(self, path: str, endpoint, **kwargs):
         return self.app.add_api_route(path, endpoint, **kwargs)
+    
+    def api_save_image(
+        self,
+        image_id: str = Form(...),
+        user_token: str = Form(...),
+        image: UploadFile = File(...)
+    ):
 
-    def api_save_image(self, file: UploadFile):
-        filename = file.filename
-        origin_image_bytes = file.file.read()
-        with open(self.config.output_dir / filename, "wb") as fw:
-            fw.write(origin_image_bytes)
+        try:
+            data={
+                'image_id': image_id,
+                'user_token': user_token
+            }
+            files={
+                'image': (image.filename, image.file.read(), image.content_type)
+            }
+
+            response = requests.post(
+                FLOORFY_ERASER_SAVE_EDNPOINT,
+                data=data,
+                files=files
+            )
+            
+            return JSONResponse(content=response.json(), status_code=response.status_code)
+        
+        except requests.RequestException as e:
+            return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
     def api_current_model(self) -> ModelInfo:
         return self.model_manager.current_model
