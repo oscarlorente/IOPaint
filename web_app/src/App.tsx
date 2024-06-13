@@ -4,7 +4,6 @@ import getInputImage from "@/hooks/getInputImage"
 import { keepGUIAlive } from "@/lib/utils"
 import { getServerConfig } from "@/lib/api"
 import Workspace from "@/components/Workspace"
-import Header from "@/components/Header"
 import { useStore } from "./lib/states"
 import { useWindowSize } from "react-use"
 
