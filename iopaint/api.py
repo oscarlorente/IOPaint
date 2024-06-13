@@ -84,7 +84,7 @@ if APP_ENV == "prod":
         "https://floorfy.com" + ERASER_IMAGE_SAVE
 else:
     FLOORFY_ERASER_SAVE_EDNPOINT = \
-        "https://1643-create-lightgallery-plugin-to-access-to-new-photo-eraser.agency.floorfy.com" + ERASER_IMAGE_SAVE
+        "https://1643-create-lightgallery-plugin-to-access-to-new-photo-eraser.floorfy.com" + ERASER_IMAGE_SAVE
 
     # "https://staging.floorfy.com" + ERASER_IMAGE_SAVE
 
@@ -290,6 +290,7 @@ class Api:
             tour_id=tourId
         )
         img_key = prefix_path + imageName
+        # TODO: REMOVE TMP IMAGE!!!!!!!!!!!!!!!!!!!!!!!!!
         img_path = os.path.join(self.img_dir, imageName)
         try:
             self.s3_resource.meta.client.download_file(
