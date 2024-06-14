@@ -276,6 +276,8 @@ export default function Editor(props: EditorProps) {
       `[on file load] image size: ${width}x${height}, scale: ${s}, initialCentered: ${initialCentered}`
     )
 
+    window.parent.postMessage({ type: 'image_loaded', isImageLoaded: true }, '*')
+
     if (context?.canvas) {
       console.log("[on file load] set canvas size")
       if (width != context.canvas.width) {
