@@ -713,7 +713,7 @@ export default function Editor(props: EditorProps) {
           value={[baseBrushSize]}
           onValueChange={(vals) => handleSliderChange(vals[0])}
           onClick={() => setShowRefBrush(false)}
-          disabled={isSaving}
+          disabled={isProcessing || isSaving}
         />
         <div className="flex gap-2">
           <IconButton
@@ -726,7 +726,7 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.undo')}
             onClick={handleUndo}
-            disabled={undoDisabled || isSaving}
+            disabled={undoDisabled || isProcessing || isSaving}
           >
             <Undo />
           </IconButton>
@@ -747,7 +747,7 @@ export default function Editor(props: EditorProps) {
             onPointerUp={() => {
               setShowOriginal(false)
             }}
-            disabled={renders.length === 0 || isSaving}
+            disabled={renders.length === 0 || isProcessing || isSaving}
           >
             <Eye />
           </IconButton>
@@ -755,7 +755,7 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.deleteObject')}
             disabled={
-              isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
+              isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
             }
             onClick={() => {
               runInpainting()
@@ -768,7 +768,14 @@ export default function Editor(props: EditorProps) {
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}
             onClick={saveChanges}
           >
-            {t('editor.save')}
+            {isSaving ? (
+            <>
+              <div className="inline-block w-4 h-4 border-2 border-black rounded-full spinner-border animate-spin border-t-transparent"></div>
+                {t('editor.saving')}...
+            </>
+          ) : (
+            t('editor.save')
+          )}
           </Button>
       </div>
       </div>

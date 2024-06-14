@@ -1,6 +1,7 @@
 {
     "editor": {
         "save": "Speichern",
+        "saving": "Speichern",
         "undo": "Rückgängig machen",
         "redo": "Wiederholen",
         "deleteObject": "Objekt löschen",

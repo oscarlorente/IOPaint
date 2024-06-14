@@ -1,6 +1,7 @@
 {
     "editor": {
         "save": "Save",
+        "saving": "Saving",
         "undo": "Undo",
         "redo": "Redo",
         "deleteObject": "Delete object",

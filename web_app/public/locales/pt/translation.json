@@ -1,6 +1,7 @@
 {
     "editor": {
         "save": "Salvar",
+        "saving": "Salvando",
         "undo": "Desfazer",
         "redo": "Refazer",
         "deleteObject": "Excluir objeto",

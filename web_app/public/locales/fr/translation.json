@@ -1,6 +1,7 @@
 {
     "editor": {
         "save": "Enregistrer",
+        "saving": "Sauvegarde",
         "undo": "Annuler",
         "redo": "Rétablir",
         "deleteObject": "Supprimer l'objet",

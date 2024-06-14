@@ -1,6 +1,7 @@
 {
     "editor": {
         "save": "Guardar",
+        "saving": "Guardando",
         "undo": "Deshacer",
         "redo": "Rehacer",
         "deleteObject": "Eliminar objeto",
