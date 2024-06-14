@@ -11,7 +11,7 @@ import { convertToBase64, srcToFile } from "@/lib/utils"
 import axios from "axios"
 
 // export const API_ENDPOINT = "https://albacore-touched-pony.ngrok-free.app/api/v1"
-export const API_ENDPOINT = "https://b755ce1936894f.lhr.life/api/v1"
+export const API_ENDPOINT = "https://749f1ce28053d6.lhr.life/api/v1"
 // export const API_ENDPOINT = "http://127.0.0.1:8080/api/v1"
 
 const api = axios.create({
