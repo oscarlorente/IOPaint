@@ -3,6 +3,13 @@ import { shallow } from "zustand/shallow"
 import { immer } from "zustand/middleware/immer"
 import { castDraft } from "immer"
 import { createWithEqualityFn } from "zustand/traditional"
+import i18next from 'i18next'; 
+  
+// Define a function to translate strings
+function t(key: string): string {
+  return i18next.t(key);
+}
+
 import {
   AdjustMaskOperate,
   CV2Flag,
@@ -544,8 +551,8 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
 
         try {
           toast({
-            title: "Removing object...",
-            description: "The object is being removed from the image.",
+            title: t('editor.removingObjectToastTitle'),
+            description: t('editor.removingObjectToastDescription'),
             showClose: false,
             duration: Infinity
           });
@@ -563,8 +570,8 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
             get().setSeed(parseInt(seed, 10))
             toast({
               variant: "success",
-              title: "Removed successfully!",
-              description: "Object have been removed.",
+              title: t('editor.removeObjectSuccessToastTitle'),
+              description: t('editor.removeObjectSuccessToastDescription'),
               showClose: false
             });
           }
@@ -583,8 +590,11 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
         } catch (e: any) {
           toast({
             variant: "destructive",
-            description: e.message ? e.message : e.toString(),
+            title: t('editor.removeObjectErrorToastTitle'),
+            description: t('editor.removeObjectErrorToastDescription'),
           })
+
+          console.error(e.message ? e.message : e.toString());
         }
 
         get().resetRedoState()

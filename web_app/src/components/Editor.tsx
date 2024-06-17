@@ -124,8 +124,8 @@ export default function Editor(props: EditorProps) {
     const userToken = searchParams.get("userToken")!;
 
     toast({
-      title: "Saving image...",
-      description: "Image is currently being saved.",
+      title: t('editor.savingImageToastTitle'),
+      description: t('editor.savingImageToastDescription'),
     });
 
     try {
@@ -136,20 +136,19 @@ export default function Editor(props: EditorProps) {
         imageId,
         userToken
       )
-      console.log('Image saved successfully');
       setIsSaved(true);
       window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
       toast({
         variant: "success",
-        title: "Saved successfully!",
-        description: "Image have been saved successfully.",
+        title: t('editor.saveImageSuccessToastTitle'),
+        description: t('editor.saveImageSuccessToastDescription'),
       });
 
     } catch (e: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong",
-        description: "Image could not be saved.",
+        title: t('editor.saveImageErrorToastTitle'),
+        description: t('editor.saveImageErrorToastDescription'),
       });
       console.error(e.message ? e.message : e.toString());
     } finally {
