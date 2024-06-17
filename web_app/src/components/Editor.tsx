@@ -16,7 +16,7 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand } from "lucide-react"
+import { Eraser, Eye, Redo, Undo } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
