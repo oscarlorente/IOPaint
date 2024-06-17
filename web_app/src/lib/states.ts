@@ -553,7 +553,6 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
           toast({
             title: t('editor.removingObjectToastTitle'),
             description: t('editor.removingObjectToastDescription'),
-            showClose: false,
             duration: Infinity
           });
           const res = await inpaint(
@@ -572,7 +571,6 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
               variant: "success",
               title: t('editor.removeObjectSuccessToastTitle'),
               description: t('editor.removeObjectSuccessToastDescription'),
-              showClose: false
             });
           }
           const newRender = new Image()
