@@ -543,6 +543,12 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
         }
 
         try {
+          toast({
+            title: "Removing object...",
+            description: "The object is being removed from the image.",
+            showClose: false,
+            duration: Infinity
+          });
           const res = await inpaint(
             targetFile,
             settings,
@@ -555,6 +561,12 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
           const { blob, seed } = res
           if (seed) {
             get().setSeed(parseInt(seed, 10))
+            toast({
+              variant: "success",
+              title: "Removed successfully!",
+              description: "Object have been removed.",
+              showClose: false
+            });
           }
           const newRender = new Image()
           await loadImage(newRender, blob)
