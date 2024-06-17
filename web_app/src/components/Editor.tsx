@@ -99,7 +99,7 @@ export default function Editor(props: EditorProps) {
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isSaved, setIsSaved] = useState<boolean>(false)
 
-  const [scale, setScale] = useState<number>(1)
+  // const [setScale] = useState<number>(1)
   const [panned, setPanned] = useState<boolean>(false)
   const [minScale, setMinScale] = useState<number>(1.0)
   const windowCenterX = windowSize.width / 2
@@ -277,7 +277,7 @@ export default function Editor(props: EditorProps) {
       s = Math.min(rW, rH)
     }
     setMinScale(s)
-    setScale(s)
+    //setScale(s)
 
     console.log(
       `[on file load] image size: ${width}x${height}, scale: ${s}, initialCentered: ${initialCentered}`
@@ -334,7 +334,7 @@ export default function Editor(props: EditorProps) {
       viewport.instance.transformState.scale = minScale
     }
 
-    setScale(minScale)
+    //setScale(minScale)
     setPanned(false)
   }, [
     viewportRef,
@@ -589,9 +589,9 @@ export default function Editor(props: EditorProps) {
             setPanned(true)
           }
         }}
-        onZoom={(ref) => {
-          setScale(ref.state.scale)
-        }}
+        // onZoom={(ref) => {
+        //   setScale(ref.state.scale)
+        // }}
       >
         <TransformComponent
           contentStyle={{
