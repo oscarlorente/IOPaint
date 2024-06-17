@@ -724,13 +724,6 @@ export default function Editor(props: EditorProps) {
         />
         <div className="flex gap-2">
           <IconButton
-            tooltip={t('editor.resetZoom')}
-            disabled={scale === minScale && panned === false}
-            onClick={resetZoom}
-          >
-            <Expand />
-          </IconButton>
-          <IconButton
             tooltip={t('editor.undo')}
             onClick={handleUndo}
             disabled={undoDisabled || isProcessing || isSaving}
