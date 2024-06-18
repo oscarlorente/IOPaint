@@ -110,7 +110,7 @@ export default function Editor(props: EditorProps) {
   const [initialCentered, setInitialCentered] = useState(false)
 
   const [isDraging, setIsDraging] = useState(false)
-
+  const [isLoaded, setIsLoaded] = useState(false);
   const hadDrawSomething = useCallback(() => {
     return curLineGroup.length !== 0
   }, [curLineGroup])
@@ -288,6 +288,10 @@ export default function Editor(props: EditorProps) {
 
     window.parent.postMessage({ type: 'image_loaded', isImageLoaded: true }, '*')
 
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 500);
+    
     if (context?.canvas) {
       console.log("[on file load] set canvas size")
       if (width != context.canvas.width) {
@@ -622,7 +626,8 @@ export default function Editor(props: EditorProps) {
         <TransformComponent
           contentStyle={{
             visibility: initialCentered ? "visible" : "hidden",
-            transition: "all .2s ease-in"
+            opacity: initialCentered ? "1" : "0.5",
+            transition: isLoaded ? "transform .2s ease-in" : "opacity .2s ease-in"
           }}
         >
           <div className="grid [grid-template-areas:'editor-content'] gap-y-4">
