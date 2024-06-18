@@ -99,9 +99,10 @@ export default function Editor(props: EditorProps) {
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isSaved, setIsSaved] = useState<boolean>(false)
 
-  // const [setScale] = useState<number>(1)
-  const [panned, setPanned] = useState<boolean>(false)
+  const [scale, setScale] = useState<number>(1)
   const [minScale, setMinScale] = useState<number>(1.0)
+  // const [prevScale, setPrevScale] = useState<number>(1.0)
+  const [panned, setPanned] = useState<boolean>(false)
   const windowCenterX = windowSize.width / 2
   const windowCenterY = windowSize.height / 2
   const viewportRef = useRef<ReactZoomPanPinchContentRef | null>(null)
@@ -277,10 +278,11 @@ export default function Editor(props: EditorProps) {
       s = Math.min(rW, rH)
     }
     setMinScale(s)
-    //setScale(s)
+    // setScale(s)
+    // setPrevScale(s)
 
     console.log(
-      `[on file load] image size: ${width}x${height}, scale: ${s}, initialCentered: ${initialCentered}`
+      `[on file load] image size: ${width}x${height}, scale: ${s}, minScale: ${minScale}, initialCentered: ${initialCentered}`
     )
 
     window.parent.postMessage({ type: 'image_loaded', isImageLoaded: true }, '*')
@@ -334,7 +336,8 @@ export default function Editor(props: EditorProps) {
       viewport.instance.transformState.scale = minScale
     }
 
-    //setScale(minScale)
+    // setPrevScale(scale)
+    // setScale(minScale)
     setPanned(false)
   }, [
     viewportRef,
@@ -344,6 +347,27 @@ export default function Editor(props: EditorProps) {
     windowSize.height,
     minScale,
   ])
+
+  // Zoom reset
+  useEffect(() => {
+    if (!minScale || !windowSize) {
+      return
+    }
+    const viewport = viewportRef.current
+    if (!viewport) {
+      return
+    }
+    // console.log(`prevScale: ${prevScale}, scale: ${scale}, minScale: ${minScale}`)
+    console.log(`scale: ${scale}, minScale: ${minScale}`)
+    // if (prevScale > scale && scale*0.75 <= minScale) {
+    if (scale*0.95 <= minScale) {
+      viewportRef.current?.centerView(scale, 1)
+    }
+    // setPrevScale(scale)
+  }, [
+    scale,
+  ])
+
 
   useEffect(() => {
     window.addEventListener("resize", () => {
@@ -523,6 +547,7 @@ export default function Editor(props: EditorProps) {
 
   const getBrushStyle = (_x: number, _y: number) => {
     const curScale = getCurScale()
+    console.log(`brush size: ${brushSize} - current scale: ${curScale}`)
     return {
       width: `${brushSize * curScale}px`,
       height: `${brushSize * curScale}px`,
@@ -589,9 +614,9 @@ export default function Editor(props: EditorProps) {
             setPanned(true)
           }
         }}
-        // onZoom={(ref) => {
-        //   setScale(ref.state.scale)
-        // }}
+        onZoom={(ref) => {
+          setScale(ref.state.scale)
+        }}
       >
         <TransformComponent
           contentStyle={{
