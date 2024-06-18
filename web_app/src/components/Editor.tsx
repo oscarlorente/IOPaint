@@ -150,6 +150,7 @@ export default function Editor(props: EditorProps) {
         variant: "destructive",
         title: t('editor.saveImageErrorToastTitle'),
         description: t('editor.saveImageErrorToastDescription'),
+        showClose: true
       });
       console.error(e.message ? e.message : e.toString());
     } finally {
@@ -621,6 +622,7 @@ export default function Editor(props: EditorProps) {
         <TransformComponent
           contentStyle={{
             visibility: initialCentered ? "visible" : "hidden",
+            transition: "all .2s ease-in"
           }}
         >
           <div className="grid [grid-template-areas:'editor-content'] gap-y-4">
