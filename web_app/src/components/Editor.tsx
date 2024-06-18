@@ -16,7 +16,7 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand } from "lucide-react"
+import { Eraser, Eye, Redo, Undo } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
@@ -99,7 +99,7 @@ export default function Editor(props: EditorProps) {
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [isSaved, setIsSaved] = useState<boolean>(false)
 
-  const [scale, setScale] = useState<number>(1)
+  // const [setScale] = useState<number>(1)
   const [panned, setPanned] = useState<boolean>(false)
   const [minScale, setMinScale] = useState<number>(1.0)
   const windowCenterX = windowSize.width / 2
@@ -123,6 +123,11 @@ export default function Editor(props: EditorProps) {
     const imageId = searchParams.get("imageId")!;
     const userToken = searchParams.get("userToken")!;
 
+    toast({
+      title: t('editor.savingImageToastTitle'),
+      description: t('editor.savingImageToastDescription'),
+    });
+
     try {
       await saveImage(
         renders[renders.length - 1],
@@ -131,19 +136,21 @@ export default function Editor(props: EditorProps) {
         imageId,
         userToken
       )
-      console.log('Image saved successfully');
       setIsSaved(true);
       window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
       toast({
-        description: "Save image success",
+        variant: "success",
+        title: t('editor.saveImageSuccessToastTitle'),
+        description: t('editor.saveImageSuccessToastDescription'),
       });
 
     } catch (e: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: e.message ? e.message : e.toString(),
+        title: t('editor.saveImageErrorToastTitle'),
+        description: t('editor.saveImageErrorToastDescription'),
       });
+      console.error(e.message ? e.message : e.toString());
     } finally {
       setIsSaving(false);
     }
@@ -270,11 +277,13 @@ export default function Editor(props: EditorProps) {
       s = Math.min(rW, rH)
     }
     setMinScale(s)
-    setScale(s)
+    //setScale(s)
 
     console.log(
       `[on file load] image size: ${width}x${height}, scale: ${s}, initialCentered: ${initialCentered}`
     )
+
+    window.parent.postMessage({ type: 'image_loaded', isImageLoaded: true }, '*')
 
     if (context?.canvas) {
       console.log("[on file load] set canvas size")
@@ -325,7 +334,7 @@ export default function Editor(props: EditorProps) {
       viewport.instance.transformState.scale = minScale
     }
 
-    setScale(minScale)
+    //setScale(minScale)
     setPanned(false)
   }, [
     viewportRef,
@@ -580,9 +589,9 @@ export default function Editor(props: EditorProps) {
             setPanned(true)
           }
         }}
-        onZoom={(ref) => {
-          setScale(ref.state.scale)
-        }}
+        // onZoom={(ref) => {
+        //   setScale(ref.state.scale)
+        // }}
       >
         <TransformComponent
           contentStyle={{
@@ -711,20 +720,13 @@ export default function Editor(props: EditorProps) {
           value={[baseBrushSize]}
           onValueChange={(vals) => handleSliderChange(vals[0])}
           onClick={() => setShowRefBrush(false)}
-          disabled={isSaving}
+          disabled={isProcessing || isSaving}
         />
         <div className="flex gap-2">
           <IconButton
-            tooltip={t('editor.resetZoom')}
-            disabled={scale === minScale && panned === false}
-            onClick={resetZoom}
-          >
-            <Expand />
-          </IconButton>
-          <IconButton
             tooltip={t('editor.undo')}
             onClick={handleUndo}
-            disabled={undoDisabled || isSaving}
+            disabled={undoDisabled || isProcessing || isSaving}
           >
             <Undo />
           </IconButton>
@@ -745,7 +747,7 @@ export default function Editor(props: EditorProps) {
             onPointerUp={() => {
               setShowOriginal(false)
             }}
-            disabled={renders.length === 0 || isSaving}
+            disabled={renders.length === 0 || isProcessing || isSaving}
           >
             <Eye />
           </IconButton>
@@ -753,7 +755,7 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.deleteObject')}
             disabled={
-              isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
+              isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
             }
             onClick={() => {
               runInpainting()
@@ -766,7 +768,14 @@ export default function Editor(props: EditorProps) {
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}
             onClick={saveChanges}
           >
-            {t('editor.save')}
+            {isSaving ? (
+            <>
+              <div className="inline-block w-4 h-4 border-2 border-black rounded-full spinner-border animate-spin border-t-transparent"></div>
+                {t('editor.saving')}...
+            </>
+          ) : (
+            t('editor.save')
+          )}
           </Button>
       </div>
       </div>
