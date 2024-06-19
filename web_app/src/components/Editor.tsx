@@ -773,8 +773,10 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.showOriginalImage')}
             onPointerDown={(ev) => {
-              ev.preventDefault()
-              setShowOriginal(true)
+              if (!(renders.length === 0 || isProcessing || isSaving)) {
+                ev.preventDefault()
+                setShowOriginal(true)
+              }
             }}
             onPointerUp={() => {
               setShowOriginal(false)
