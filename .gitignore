@@ -12,3 +12,4 @@ tmp/
 iopaint/web_app/
 tmp_img/
 .env.local
+.history/
