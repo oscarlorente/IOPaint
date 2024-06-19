@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Instructions from "./Instructions"
-import { IconButton } from "./ui/button"
-import { X } from 'lucide-react';
+import CloseButton from './CloseButton';
+
 
 const Header = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -18,9 +18,7 @@ const Header = () => {
       </div>
       <div className="flex gap-1 ">
         <Instructions isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
-        <IconButton tooltip="Close">
-          <X />
-        </IconButton>
+        <CloseButton />
       </div>
     </header>
   );
