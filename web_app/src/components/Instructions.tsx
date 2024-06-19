@@ -9,8 +9,16 @@ interface InstructionsProps {
 }
 
 export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProps) {
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      sessionStorage.setItem('dialogClosed', 'true');
+    }
+    setIsDialogOpen(open); // Update the state based on the open status
+  };
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <IconButton tooltip="Help">
           <InfoIcon />

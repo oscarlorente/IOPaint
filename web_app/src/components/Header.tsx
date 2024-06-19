@@ -2,15 +2,19 @@ import { useState, useEffect } from 'react';
 import Instructions from "./Instructions"
 import CloseButton from './CloseButton';
 
-
 const Header = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    setIsDialogOpen(true);
+    const dialogClosed = sessionStorage.getItem('dialogClosed');
+
+    if (dialogClosed === 'true') {
+      setIsDialogOpen(false);
+    } else {
+      setIsDialogOpen(true); // Open the dialog by default if not closed
+    }  
   }, []);
 
-  
   return (
     <header className="h-[60px] px-6 py-4 absolute top-[0] flex justify-between items-center w-full z-20 border-b backdrop-filter backdrop-blur-md">
       <div className="flex gap-1">
