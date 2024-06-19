@@ -1,5 +1,6 @@
 {
     "editor": {
+        "erase": "Löschen",
         "save": "Speichern",
         "saving": "Speichern",
         "savingImageToastTitle": "Bild wird gespeichert...",

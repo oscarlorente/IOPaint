@@ -1,5 +1,6 @@
 {
     "editor": {
+        "erase": "Borrar",
         "save": "Guardar",
         "saving": "Guardando",
         "savingImageToastTitle": "Guardando imagen...",
@@ -8,15 +9,15 @@
         "saveImageSuccessToastDescription": "La imagen se ha guardado exitosamente.",
         "saveImageErrorToastTitle": "¡Ups! Algo salió mal",
         "saveImageErrorToastDescription": "No se pudo guardar la imagen.",
-        "removingObjectToastTitle": "Eliminando objeto...",
-        "removingObjectToastDescription": "Se está eliminando el objeto de la imagen.",
-        "removeObjectSuccessToastTitle": "¡Objeto eliminado!",
-        "removeObjectSuccessToastDescription": "El objeto ha sido eliminado correctamente.",
+        "removingObjectToastTitle": "Borrando objeto...",
+        "removingObjectToastDescription": "Se está borrando el objeto de la imagen.",
+        "removeObjectSuccessToastTitle": "¡Objeto borrado!",
+        "removeObjectSuccessToastDescription": "El objeto ha sido borrado correctamente.",
         "removeObjectErrorToastTitle": "¡Ups! Algo salió mal",
-        "removeObjectErrorToastDescription": "No se pudo eliminar el objeto.",
+        "removeObjectErrorToastDescription": "No se pudo borrar el objeto.",
         "undo": "Deshacer",
         "redo": "Rehacer",
-        "deleteObject": "Eliminar objeto",
+        "deleteObject": "Borrar objeto",
         "showOriginalImage": "Mostrar imagen original",
         "resetZoom": "Restablecer zoom"
     }

@@ -784,8 +784,7 @@ export default function Editor(props: EditorProps) {
             <Eye />
           </IconButton>
 
-          <IconButton
-            tooltip={t('editor.deleteObject')}
+          <Button
             disabled={
               isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
             }
@@ -794,7 +793,8 @@ export default function Editor(props: EditorProps) {
             }}
           >
             <Eraser />
-          </IconButton>
+            {t('editor.erase')}
+          </Button>
           
           <Button
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}

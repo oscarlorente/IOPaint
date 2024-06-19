@@ -1,5 +1,6 @@
 {
     "editor": {
+        "erase": "Erase",
         "save": "Save",
         "saving": "Saving",
         "savingImageToastTitle": "Saving image...",

@@ -1,5 +1,6 @@
 {
     "editor": {
+        "erase": "Excluir",
         "save": "Salvar",
         "saving": "Salvando",
         "savingImageToastTitle": "Salvando imagem...",
