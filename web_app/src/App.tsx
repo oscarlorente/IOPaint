@@ -7,6 +7,7 @@ import Workspace from "@/components/Workspace"
 import { useStore } from "./lib/states"
 import { useWindowSize } from "react-use"
 import { Toaster } from "./components/ui/toaster"
+import Header from "./components/Header"
 
 function Home() {
   const [updateAppState, setServerConfig, setFile] = useStore((state) => [
@@ -64,6 +65,7 @@ function Home() {
     // <main className="flex flex-col items-center justify-between w-full min-h-screen bg-black">
     <main className="flex min-h-screen flex-col items-center justify-between w-full bg-[radial-gradient(circle_at_1px_1px,_#8e8e8e8e_1px,_transparent_0)] [background-size:20px_20px] bg-repeat">
       <Toaster />
+      <Header />
       <Workspace />
     </main>
   )
