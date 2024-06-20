@@ -221,9 +221,9 @@ class Api:
                 'user_token': user_token
             }
             files={
-                'image': (image.filename, image.file.read(), image.content_type)
+                'image': (image.filename, image.file, image.content_type)
             }
-
+            
             response = requests.post(
                 FLOORFY_ERASER_SAVE_EDNPOINT,
                 data=data,
@@ -321,7 +321,7 @@ class Api:
         image, alpha_channel, infos = decode_base64_to_image(req.image)
         mask, _, _ = decode_base64_to_image(req.mask, gray=True)
 
-        mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)[1]
+        mask = cv2.threshold(mask, 100, 255, cv2.THRESH_BINARY)[1]
         if image.shape[:2] != mask.shape[:2]:
             raise HTTPException(
                 400,
@@ -341,7 +341,7 @@ class Api:
         rgb_np_img = cv2.cvtColor(rgb_np_img.astype(np.uint8), cv2.COLOR_BGR2RGB)
         rgb_res = concat_alpha_channel(rgb_np_img, alpha_channel)
 
-        ext = "png"
+        ext = "jpeg"
         res_img_bytes = pil_to_bytes(
             Image.fromarray(rgb_res),
             ext=ext,
@@ -358,7 +358,7 @@ class Api:
         )
 
     def api_run_plugin_gen_image(self, req: RunPluginRequest):
-        ext = "png"
+        ext = "jpeg"
         if req.name not in self.plugins:
             raise HTTPException(status_code=422, detail="Plugin not found")
         if not self.plugins[req.name].support_gen_image:
@@ -397,8 +397,8 @@ class Api:
         torch_gc()
         res_mask = gen_frontend_mask(bgr_or_gray_mask)
         return Response(
-            content=numpy_to_bytes(res_mask, "png"),
-            media_type="image/png",
+            content=numpy_to_bytes(res_mask, "jpeg"),
+            media_type="image/jpeg",
         )
 
     def api_samplers(self) -> List[str]:
@@ -407,7 +407,7 @@ class Api:
     def api_adjust_mask(self, req: AdjustMaskRequest):
         mask, _, _ = decode_base64_to_image(req.mask, gray=True)
         mask = adjust_mask(mask, req.kernel_size, req.operate)
-        return Response(content=numpy_to_bytes(mask, "png"), media_type="image/png")
+        return Response(content=numpy_to_bytes(mask, "jpeg"), media_type="image/jpeg")
 
     def launch(self):
         self.app.include_router(self.router)
