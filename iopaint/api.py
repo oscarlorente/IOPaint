@@ -321,7 +321,7 @@ class Api:
         image, alpha_channel, infos = decode_base64_to_image(req.image)
         mask, _, _ = decode_base64_to_image(req.mask, gray=True)
 
-        mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)[1]
+        mask = cv2.threshold(mask, 100, 255, cv2.THRESH_BINARY)[1]
         if image.shape[:2] != mask.shape[:2]:
             raise HTTPException(
                 400,
