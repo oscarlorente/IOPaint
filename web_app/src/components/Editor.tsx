@@ -16,7 +16,7 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo, Expand } from "lucide-react"
+import { Eraser, Eye, Redo, Undo } from "lucide-react"
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
@@ -100,8 +100,9 @@ export default function Editor(props: EditorProps) {
   const [isSaved, setIsSaved] = useState<boolean>(false)
 
   const [scale, setScale] = useState<number>(1)
-  const [panned, setPanned] = useState<boolean>(false)
   const [minScale, setMinScale] = useState<number>(1.0)
+  // const [prevScale, setPrevScale] = useState<number>(1.0)
+  const [panned, setPanned] = useState<boolean>(false)
   const windowCenterX = windowSize.width / 2
   const windowCenterY = windowSize.height / 2
   const viewportRef = useRef<ReactZoomPanPinchContentRef | null>(null)
@@ -109,7 +110,7 @@ export default function Editor(props: EditorProps) {
   const [initialCentered, setInitialCentered] = useState(false)
 
   const [isDraging, setIsDraging] = useState(false)
-
+  const [isLoaded, setIsLoaded] = useState(false);
   const hadDrawSomething = useCallback(() => {
     return curLineGroup.length !== 0
   }, [curLineGroup])
@@ -123,6 +124,11 @@ export default function Editor(props: EditorProps) {
     const imageId = searchParams.get("imageId")!;
     const userToken = searchParams.get("userToken")!;
 
+    toast({
+      title: t('editor.savingImageToastTitle'),
+      description: t('editor.savingImageToastDescription'),
+    });
+
     try {
       await saveImage(
         renders[renders.length - 1],
@@ -131,19 +137,22 @@ export default function Editor(props: EditorProps) {
         imageId,
         userToken
       )
-      console.log('Image saved successfully');
       setIsSaved(true);
       window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
       toast({
-        description: "Save image success",
+        variant: "success",
+        title: t('editor.saveImageSuccessToastTitle'),
+        description: t('editor.saveImageSuccessToastDescription'),
       });
 
     } catch (e: any) {
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: e.message ? e.message : e.toString(),
+        title: t('editor.saveImageErrorToastTitle'),
+        description: t('editor.saveImageErrorToastDescription'),
+        showClose: true
       });
+      console.error(e.message ? e.message : e.toString());
     } finally {
       setIsSaving(false);
     }
@@ -270,12 +279,19 @@ export default function Editor(props: EditorProps) {
       s = Math.min(rW, rH)
     }
     setMinScale(s)
-    setScale(s)
+    // setScale(s)
+    // setPrevScale(s)
 
     console.log(
-      `[on file load] image size: ${width}x${height}, scale: ${s}, initialCentered: ${initialCentered}`
+      `[on file load] image size: ${width}x${height}, scale: ${s}, minScale: ${minScale}, initialCentered: ${initialCentered}`
     )
 
+    window.parent.postMessage({ type: 'image_loaded', isImageLoaded: true }, '*')
+
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 500);
+    
     if (context?.canvas) {
       console.log("[on file load] set canvas size")
       if (width != context.canvas.width) {
@@ -325,7 +341,8 @@ export default function Editor(props: EditorProps) {
       viewport.instance.transformState.scale = minScale
     }
 
-    setScale(minScale)
+    // setPrevScale(scale)
+    // setScale(minScale)
     setPanned(false)
   }, [
     viewportRef,
@@ -335,6 +352,27 @@ export default function Editor(props: EditorProps) {
     windowSize.height,
     minScale,
   ])
+
+  // Zoom reset
+  useEffect(() => {
+    if (!minScale || !windowSize) {
+      return
+    }
+    const viewport = viewportRef.current
+    if (!viewport) {
+      return
+    }
+    // console.log(`prevScale: ${prevScale}, scale: ${scale}, minScale: ${minScale}`)
+    console.log(`scale: ${scale}, minScale: ${minScale}`)
+    // if (prevScale > scale && scale*0.75 <= minScale) {
+    if (scale*0.95 <= minScale) {
+      viewportRef.current?.centerView(scale, 1)
+    }
+    // setPrevScale(scale)
+  }, [
+    scale,
+  ])
+
 
   useEffect(() => {
     window.addEventListener("resize", () => {
@@ -514,6 +552,7 @@ export default function Editor(props: EditorProps) {
 
   const getBrushStyle = (_x: number, _y: number) => {
     const curScale = getCurScale()
+    console.log(`brush size: ${brushSize} - current scale: ${curScale}`)
     return {
       width: `${brushSize * curScale}px`,
       height: `${brushSize * curScale}px`,
@@ -526,7 +565,7 @@ export default function Editor(props: EditorProps) {
   const renderBrush = (style: any) => {
     return (
       <div
-        className="absolute rounded-[50%] border-[1px] border-[solid] border-[#ffcc00] pointer-events-none bg-[#ffcc00bb]"
+        className="absolute rounded-[50%] border-[1px] border-[solid] border-[#3976F9] pointer-events-none bg-[#3976F9bb]"
         style={style}
       />
     )
@@ -587,6 +626,8 @@ export default function Editor(props: EditorProps) {
         <TransformComponent
           contentStyle={{
             visibility: initialCentered ? "visible" : "hidden",
+            opacity: initialCentered ? "1" : "0.5",
+            transition: isLoaded ? "transform .2s ease-in" : "opacity .2s ease-in"
           }}
         >
           <div className="grid [grid-template-areas:'editor-content'] gap-y-4">
@@ -700,7 +741,7 @@ export default function Editor(props: EditorProps) {
 
       {showRefBrush && renderBrush(getBrushStyle(windowCenterX, windowCenterY))}
 
-      <div className="fixed flex bottom-5 border px-4 py-2 rounded-[3rem] gap-8 items-center justify-center backdrop-filter backdrop-blur-md bg-background/70">
+      <div className={`fixed flex bottom-5 border px-4 py-2 rounded-[3rem] gap-8 items-center justify-center backdrop-filter backdrop-blur-md bg-background/70 transition-opacity	${isDraging ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
         <Slider
           className="w-48"
           defaultValue={[50]}
@@ -711,20 +752,13 @@ export default function Editor(props: EditorProps) {
           value={[baseBrushSize]}
           onValueChange={(vals) => handleSliderChange(vals[0])}
           onClick={() => setShowRefBrush(false)}
-          disabled={isSaving}
+          disabled={isProcessing || isSaving}
         />
         <div className="flex gap-2">
           <IconButton
-            tooltip={t('editor.resetZoom')}
-            disabled={scale === minScale && panned === false}
-            onClick={resetZoom}
-          >
-            <Expand />
-          </IconButton>
-          <IconButton
             tooltip={t('editor.undo')}
             onClick={handleUndo}
-            disabled={undoDisabled || isSaving}
+            disabled={undoDisabled || isProcessing || isSaving}
           >
             <Undo />
           </IconButton>
@@ -739,34 +773,43 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.showOriginalImage')}
             onPointerDown={(ev) => {
-              ev.preventDefault()
-              setShowOriginal(true)
+              if (!(renders.length === 0 || isProcessing || isSaving)) {
+                ev.preventDefault()
+                setShowOriginal(true)
+              }
             }}
             onPointerUp={() => {
               setShowOriginal(false)
             }}
-            disabled={renders.length === 0 || isSaving}
+            disabled={renders.length === 0 || isProcessing || isSaving}
           >
             <Eye />
           </IconButton>
 
-          <IconButton
-            tooltip={t('editor.deleteObject')}
+          <Button
             disabled={
-              isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
+              isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
             }
             onClick={() => {
               runInpainting()
             }}
           >
             <Eraser />
-          </IconButton>
+            {t('editor.erase')}
+          </Button>
           
           <Button
             disabled={isProcessing || isSaving || isSaved || renders.length === 0}
             onClick={saveChanges}
           >
-            {t('editor.save')}
+            {isSaving ? (
+            <>
+              <div className="inline-block w-4 h-4 border-2 border-black rounded-full spinner-border animate-spin border-t-transparent"></div>
+                {t('editor.saving')}...
+            </>
+          ) : (
+            t('editor.save')
+          )}
           </Button>
       </div>
       </div>

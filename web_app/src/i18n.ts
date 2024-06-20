@@ -17,7 +17,7 @@ const I18nInitializer = () => {
       .init({
         lng: langParam || 'en',
         fallbackLng: 'en',
-        debug: true,
+        debug: false,
         interpolation: {
           escapeValue: false,
         },

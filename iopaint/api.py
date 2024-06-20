@@ -290,6 +290,7 @@ class Api:
             tour_id=tourId
         )
         img_key = prefix_path + imageName
+        # TODO: REMOVE TMP IMAGE!!!!!!!!!!!!!!!!!!!!!!!!!
         img_path = os.path.join(self.img_dir, imageName)
         try:
             self.s3_resource.meta.client.download_file(
