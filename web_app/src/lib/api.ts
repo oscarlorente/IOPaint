@@ -46,7 +46,7 @@ export default async function inpaint(
       zits_wireframe: settings.zitsWireframe,
       cv2_flag: settings.cv2Flag,
       cv2_radius: settings.cv2Radius,
-      hd_strategy: "Crop",
+      hd_strategy: "Resize",
       hd_strategy_crop_triger_size: 640,
       hd_strategy_crop_margin: 128,
       hd_strategy_resize_limit: 2048,
