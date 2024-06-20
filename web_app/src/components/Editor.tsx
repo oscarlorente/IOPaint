@@ -565,7 +565,7 @@ export default function Editor(props: EditorProps) {
   const renderBrush = (style: any) => {
     return (
       <div
-        className="absolute rounded-[50%] border-[1px] border-[solid] border-[#ffcc00] pointer-events-none bg-[#ffcc00bb]"
+        className="absolute rounded-[50%] border-[1px] border-[solid] border-[#3976F9] pointer-events-none bg-[#3976F9bb]"
         style={style}
       />
     )
