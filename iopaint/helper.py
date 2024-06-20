@@ -134,7 +134,7 @@ def numpy_to_bytes(image_numpy: np.ndarray, ext: str) -> bytes:
     data = cv2.imencode(
         f".{ext}",
         image_numpy,
-        [int(cv2.IMWRITE_JPEG_QUALITY), 100, int(cv2.IMWRITE_PNG_COMPRESSION), 0],
+        [int(cv2.IMWRITE_JPEG_QUALITY), 100],
     )[1]
     image_bytes = data.tobytes()
     return image_bytes

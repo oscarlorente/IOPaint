@@ -38,7 +38,7 @@ class FileManager:
 
     def api_media_file(self, tab: MediaTab, filename: str) -> FileResponse:
         file_path = self._get_file(tab, filename)
-        return FileResponse(file_path, media_type="image/png")
+        return FileResponse(file_path, media_type="image/jpeg")
 
     # tab=${tab}?filename=${filename.name}?width=${width}&height=${height}
     def api_media_thumbnail_file(

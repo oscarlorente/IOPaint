@@ -159,7 +159,7 @@ export async function getMediaFile(tab: string, filename: string) {
   if (res.ok) {
     const blob = await res.blob()
     const file = new File([blob], filename, {
-      type: res.headers.get("Content-Type") ?? "image/png",
+      type: res.headers.get("Content-Type") ?? "image/jpeg",
     })
     return file
   }

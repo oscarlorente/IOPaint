@@ -150,7 +150,7 @@ export function isMidClick(ev: SyntheticEvent) {
 }
 
 export async function copyCanvasImage(canvas: HTMLCanvasElement) {
-  const blob = await canvasToBlob(canvas, "image/png")
+  const blob = await canvasToBlob(canvas, "image/jpeg")
   try {
     await setToClipboard(blob)
   } catch {
