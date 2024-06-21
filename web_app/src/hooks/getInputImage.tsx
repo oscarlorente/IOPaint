@@ -13,20 +13,17 @@ export default function getInputImage(agencyId: string, userToken: string, tourI
     fetch(`${API_ENDPOINT}/get_image_from_s3?agencyId=${agencyId}&userToken=${userToken}&tourId=${tourId}&imageId=${imageId}&imageName=${imageName}`, { headers })
       .then(async (res) => {
         if (!res.ok) {
+          console.error("Failed to fetch the image");
           return
         }
-        const filename = res.headers
-          .get("content-disposition")
-          ?.split("filename=")[1]
-          .split(";")[0]
 
-        const data = await res.blob()
+        const data = await res.blob();
         if (data && data.type.startsWith("image")) {
           const userInput = new File(
             [data],
-            filename !== undefined ? filename : "inputImage"
-          )
-          setInputImage(userInput)
+            imageName !== undefined ? imageName : "inputImage"
+          );
+          setInputImage(userInput);
         }
       })
       .catch((err) => {
