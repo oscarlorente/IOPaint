@@ -26,7 +26,9 @@
             "checkboxText": "No volver a mostrar"
         },
         "header": {
-            "title": "Borrador de objetos"
+            "title": "Borrador de objetos",
+            "infoButton": "Ayuda",
+            "closeButton": "Cerrar"
         }
     }
 }

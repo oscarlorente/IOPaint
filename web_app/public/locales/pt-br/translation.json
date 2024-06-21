@@ -19,6 +19,16 @@
         "redo": "Refazer",
         "deleteObject": "Excluir objeto",
         "showOriginalImage": "Mostrar imagem original",
-        "resetZoom": "Redefinir zoom"
+        "resetZoom": "Redefinir zoom",
+        "instructions": {
+            "title": "Novo apagador de objetos!",
+            "description": "Use o pincel para destacar e remover elementos indesejados de suas imagens.",
+            "checkboxText": "Não mostrar novamente"
+        },
+        "header": {
+            "title": "Apagador de objetos",
+            "infoButton": "Ajuda",
+            "closeButton": "Fechar"
+        }
     }
 }

@@ -30,7 +30,7 @@ export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProp
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <IconButton tooltip="Help">
+        <IconButton tooltip={t('editor.header.infoButton')}>
           <InfoIcon />
         </IconButton>
       </DialogTrigger>
