@@ -24,6 +24,9 @@
             "title": "¡New photo eraser!",
             "description": "Use the brush to highlight and remove unwanted elements from your images.",
             "checkboxText": "Don't show it again"
+        },
+        "header": {
+            "title": "Object eraser"
         }
     }
 }

@@ -24,6 +24,9 @@
             "title": "Nuova gomma per oggetti!",
             "description": "Usa il pennello per evidenziare e rimuovere elementi indesiderati dalle tue immagini.",
             "checkboxText": "Non mostrare più"
+        },
+        "header": {
+            "title": "Cancellatore di oggetti"
         }
     }
 }

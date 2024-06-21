@@ -24,6 +24,9 @@
             "title": "Nouvelle gomme à objets!",
             "description": "Utilisez le pinceau pour mettre en évidence et supprimer les éléments indésirables de vos images.",
             "checkboxText": "Ne plus afficher"
+        },
+        "header": {
+            "title": "Effaceur d'objets"
         }
     }
 }

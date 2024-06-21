@@ -24,6 +24,9 @@
             "title": "Novo apagador de objetos!",
             "description": "Use o pincel para destacar e remover elementos indesejados de suas imagens.",
             "checkboxText": "Não mostrar novamente"
+        },
+        "header": {
+            "title": "Apagador de objetos"
         }
     }
 }
