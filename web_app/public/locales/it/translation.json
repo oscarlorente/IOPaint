@@ -19,6 +19,11 @@
         "redo": "Ripeti",
         "deleteObject": "Delete object",
         "showOriginalImage": "Mostra immagine originale",
-        "resetZoom": "Reimposta zoom"
+        "resetZoom": "Reimposta zoom",
+        "instructions": {
+            "title": "Nuova gomma per oggetti!",
+            "description": "Usa il pennello per evidenziare e rimuovere elementi indesiderati dalle tue immagini.",
+            "checkboxText": "Non mostrare più"
+        }
     }
 }

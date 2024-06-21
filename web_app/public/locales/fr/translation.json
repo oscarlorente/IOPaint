@@ -19,6 +19,11 @@
         "redo": "Rétablir",
         "deleteObject": "Supprimer l'objet",
         "showOriginalImage": "Afficher l'image originale",
-        "resetZoom": "Réinitialiser le zoom"
+        "resetZoom": "Réinitialiser le zoom",
+        "instructions": {
+            "title": "Nouvelle gomme à objets!",
+            "description": "Utilisez le pinceau pour mettre en évidence et supprimer les éléments indésirables de vos images.",
+            "checkboxText": "Ne plus afficher"
+        }
     }
 }

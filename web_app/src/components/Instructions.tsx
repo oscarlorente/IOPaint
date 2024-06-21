@@ -1,7 +1,10 @@
-import { Info as InfoIcon } from "lucide-react"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog"
-import { IconButton } from "./ui/button"
-import { DialogDescription } from "@radix-ui/react-dialog"
+import { useState } from 'react';
+import { Info as InfoIcon } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog';
+import { IconButton } from './ui/button';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import CheckboxItem from './ui/checkbox';
+import { useTranslation } from 'react-i18next';
 
 interface InstructionsProps {
   isDialogOpen: boolean;
@@ -9,14 +12,21 @@ interface InstructionsProps {
 }
 
 export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProps) {
+  const { t } = useTranslation();
+
+  const [isChecked, setIsChecked] = useState(false);
 
   const handleOpenChange = (open: boolean) => {
-    if (!open) {
+    if (!open && isChecked) {
       sessionStorage.setItem('dialogClosed', 'true');
     }
-    setIsDialogOpen(open); // Update the state based on the open status
+    setIsDialogOpen(open);
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    setIsChecked(checked);
+  };
+  
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
@@ -25,20 +35,19 @@ export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProp
         </IconButton>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>¡New photo eraser editor!</DialogTitle>
-        <DialogDescription>
-          Use the brush to highlight and remove unwanted elements from your images!
-        </DialogDescription>
-        <video 
-          src="https://floorfymdpd.s3.eu-west-1.amazonaws.com/global/videos/videocallLaptop_video.webm" 
-          autoPlay 
-          loop 
+        <DialogTitle>{t('editor.instructions.title')}</DialogTitle>
+        <DialogDescription>{t('editor.instructions.description')}</DialogDescription>
+        <video
+          src="https://floorfymdpd.s3.eu-west-1.amazonaws.com/global/videos/videocallLaptop_video.webm"
+          autoPlay
+          loop
           muted
           className="rounded-lg"
         />
+        <CheckboxItem label="editor.instructions.checkboxText" checked={isChecked} onCheckedChange={handleCheckboxChange} />
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default Instructions
+export default Instructions;

@@ -19,6 +19,11 @@
         "redo": "Rehacer",
         "deleteObject": "Borrar objeto",
         "showOriginalImage": "Mostrar imagen original",
-        "resetZoom": "Restablecer zoom"
+        "resetZoom": "Restablecer zoom",
+        "instructions": {
+            "title": "¡Nuevo borrador de objetos!",
+            "description": "Utiliza el pincel para marcar y remover los elementos no deseados en tus imágenes.",
+            "checkboxText": "No volver a mostrar"
+        }
     }
 }

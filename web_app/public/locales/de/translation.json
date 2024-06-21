@@ -19,6 +19,11 @@
         "redo": "Wiederholen",
         "deleteObject": "Objekt löschen",
         "showOriginalImage": "Originalbild anzeigen",
-        "resetZoom": "Zoom zurücksetzen"
+        "resetZoom": "Zoom zurücksetzen",
+        "instructions": {
+            "title": "Neuer Objekt-Radiergummi!",
+            "description": "Verwenden Sie den Pinsel, um unerwünschte Elemente aus Ihren Bildern zu markieren und zu entfernen.",
+            "checkboxText": "Nicht mehr anzeigen"
+        }
     }
 }
