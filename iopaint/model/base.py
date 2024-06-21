@@ -89,6 +89,7 @@ class InpaintModel:
         if config.sd_keep_unmasked_area:
             mask = mask[:, :, np.newaxis]
             result = result * (mask / 255) + image[:, :, ::-1] * (1 - (mask / 255))
+        
         return result
 
     def forward_pre_process(self, image, mask, config):
@@ -128,7 +129,7 @@ class InpaintModel:
                     image, size_limit=config.hd_strategy_resize_limit
                 )
                 downsize_mask = resize_max_size(
-                    mask, size_limit=config.hd_strategy_resize_limit
+                    mask, size_limit=config.hd_strategy_resize_limit, interpolation=cv2.INTER_NEAREST
                 )
 
                 logger.info(
