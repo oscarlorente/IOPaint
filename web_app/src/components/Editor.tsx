@@ -6,7 +6,7 @@ import {
   TransformComponent,
   TransformWrapper,
 } from "react-zoom-pan-pinch"
-import { saveImage, runPlugin } from "@/lib/api"
+import { runPlugin } from "@/lib/api"
 import { Button, IconButton } from "@/components/ui/button"
 import {
   cn,
@@ -25,7 +25,6 @@ import Cropper from "./Cropper"
 import { InteractiveSegPoints } from "./InteractiveSeg"
 import Extender from "./Extender"
 import { MAX_BRUSH_SIZE, MIN_BRUSH_SIZE } from "@/lib/const"
-import { useSearchParams } from "react-router-dom"
 import { useTranslation } from 'react-i18next';
 
 const TOOLBAR_HEIGHT = 200
@@ -96,9 +95,7 @@ export default function Editor(props: EditorProps) {
   const [showBrush, setShowBrush] = useState(false)
   const [showRefBrush, setShowRefBrush] = useState(false)
   const [isPanning, setIsPanning] = useState<boolean>(false)
-  const [isSaving, setIsSaving] = useState<boolean>(false)
-  const [isSaved, setIsSaved] = useState<boolean>(false)
-
+  const [isSaving] = useState<boolean>(false)
   const [scale, setScale] = useState<number>(1)
   const [minScale, setMinScale] = useState<number>(1.0)
   // const [prevScale, setPrevScale] = useState<number>(1.0)
@@ -114,52 +111,6 @@ export default function Editor(props: EditorProps) {
   const hadDrawSomething = useCallback(() => {
     return curLineGroup.length !== 0
   }, [curLineGroup])
-
-  const [searchParams] = useSearchParams()
-
-  const saveChanges = useCallback(async () => {
-    setIsSaving(true);
-    setIsSaved(false);
-
-    const imageId = searchParams.get("imageId")!;
-    const userToken = searchParams.get("userToken")!;
-
-    toast({
-      title: t('editor.savingImageToastTitle'),
-      description: t('editor.savingImageToastDescription'),
-    });
-
-    try {
-      await saveImage(
-        renders[renders.length - 1],
-        file.name,
-        file.type,
-        imageId,
-        userToken
-      )
-      setIsSaved(true);
-      window.parent.postMessage({ type: 'image_saved', isImageSaved: true }, '*');
-      toast({
-        variant: "success",
-        title: t('editor.saveImageSuccessToastTitle'),
-        description: t('editor.saveImageSuccessToastDescription'),
-      });
-
-    } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: t('editor.saveImageErrorToastTitle'),
-        description: t('editor.saveImageErrorToastDescription'),
-        showClose: true
-      });
-      console.error(e.message ? e.message : e.toString());
-    } finally {
-      setIsSaving(false);
-    }
-  }, [
-    file,
-    renders
-  ])
 
   useEffect(() => {
     if (
@@ -787,6 +738,7 @@ export default function Editor(props: EditorProps) {
           </IconButton>
 
           <Button
+            variant="outline"
             disabled={
               isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
             }
@@ -794,23 +746,10 @@ export default function Editor(props: EditorProps) {
               runInpainting()
             }}
           >
-            <Eraser />
+            <Eraser size="sm" />
             {t('editor.erase')}
           </Button>
-          
-          <Button
-            disabled={isProcessing || isSaving || isSaved || renders.length === 0}
-            onClick={saveChanges}
-          >
-            {isSaving ? (
-            <>
-              <div className="inline-block w-4 h-4 border-2 border-black rounded-full spinner-border animate-spin border-t-transparent"></div>
-                {t('editor.saving')}...
-            </>
-          ) : (
-            t('editor.save')
-          )}
-          </Button>
+        
       </div>
       </div>
     </div>
