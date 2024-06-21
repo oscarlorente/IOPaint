@@ -180,8 +180,6 @@ class Api:
 
         self.s3_resource = boto3.resource('s3')
         self.bucket_name = os.environ["AWS_S3_NAME"]
-        self.img_dir = './tmp_img'
-        os.makedirs(self.img_dir, exist_ok=True)
 
         # fmt: off
         self.add_api_route("/api/v1/gen-info", self.api_geninfo, methods=["POST"], response_model=GenInfoResponse)
@@ -284,22 +282,21 @@ class Api:
             samplers=self.api_samplers(),
         )
 
-    def api_get_image_from_s3(self, agencyId: str, tourId: str, imageName: str) -> FileResponse:
+    def api_get_image_from_s3(self, agencyId: str, tourId: str, imageName: str):
         prefix_path = TOUR_KEY_PATH_PREFIX.format(
             agency_id=agencyId,
             tour_id=tourId
         )
         img_key = prefix_path + imageName
-        # TODO: REMOVE TMP IMAGE!!!!!!!!!!!!!!!!!!!!!!!!!
-        img_path = os.path.join(self.img_dir, imageName)
         try:
-            self.s3_resource.meta.client.download_file(
-                Bucket=self.bucket_name,
-                Key=img_key,
-                Filename=img_path
+            s3_object = self.s3_resource.Object(self.bucket_name, img_key)
+            img_bytes = s3_object.get()['Body'].read()
+            
+            return Response(
+                content=img_bytes,
+                media_type="image/jpeg",
             )
 
-            return FileResponse(img_path)
         except ClientError as e:
             raise HTTPException(status_code=404, detail=f"Error downloading image from s3: {e}")
 
