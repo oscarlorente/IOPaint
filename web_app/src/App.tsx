@@ -18,6 +18,7 @@ function Home() {
 
   const [searchParams] = useSearchParams()
   const [params, setParams] = useState({
+    bucketName: searchParams.get("bucketName")!,
     agencyId: searchParams.get("agencyId")!,
     userToken: searchParams.get("userToken")!,
     tourId: searchParams.get("tourId")!,
@@ -26,16 +27,17 @@ function Home() {
   });
 
   useEffect(() => {
+    const bucketName = searchParams.get("bucketName")!;
     const agencyId = searchParams.get("agencyId")!;
     const userToken = searchParams.get("userToken")!;
     const tourId = searchParams.get("tourId")!;
     const imageId = searchParams.get("imageId")!;
     const imageName = searchParams.get("imageName")!;
   
-    setParams({ agencyId, userToken, tourId, imageId, imageName });
+    setParams({ bucketName, agencyId, userToken, tourId, imageId, imageName });
   }, [searchParams]);
 
-  const userInputImage = getInputImage(params.agencyId, params.userToken, params.tourId, params.imageId, params.imageName)
+  const userInputImage = getInputImage(params.bucketName, params.agencyId, params.userToken, params.tourId, params.imageId, params.imageName)
 
   const windowSize = useWindowSize()
 
