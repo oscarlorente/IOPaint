@@ -44,7 +44,7 @@ const Header = (props: HeaderProps) => {
           >
             {isSaving ? (
             <>
-              <div className="inline-block w-4 h-4 border-2 border-black rounded-full spinner-border animate-spin border-t-transparent"></div>
+              <div className="inline-block w-4 h-4 border-2 border-white rounded-full spinner-border animate-spin border-t-transparent"></div>
                 {t('editor.saving')}...
             </>
           ) : (
