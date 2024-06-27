@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useStore } from "@/lib/states"
 import { useSearchParams } from 'react-router-dom';
 import { useToast } from "@/components/ui/use-toast"
 import { t } from 'i18next';
@@ -8,8 +9,8 @@ import { saveImage } from "@/lib/api"
 const useSaveChanges = (file: File, renders: HTMLImageElement[] = []) => {
     const [searchParams] = useSearchParams();
     const [isSaving, setIsSaving] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
     const { toast } = useToast();
+    const setIsSaved = useStore((state) => state.setIsSaved);
 
     const saveChanges = useCallback(async () => {
         setIsSaving(true);
@@ -54,7 +55,9 @@ const useSaveChanges = (file: File, renders: HTMLImageElement[] = []) => {
         } finally {
             setIsSaving(false);
         }
-    }, [file, renders, searchParams, toast]);
+     }, [file, renders, searchParams, toast, setIsSaved]);
+
+    const isSaved = useStore(state => state.isSaved);
 
     return { saveChanges, isSaving, isSaved };
 };

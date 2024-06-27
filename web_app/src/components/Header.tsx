@@ -19,8 +19,10 @@ const Header = (props: HeaderProps) => {
   // Fetch renders from the store
   const renders = useStore((state) => state.editorState.renders) || [];
 
+  const isSaved = useStore((state) => state.isSaved);
+
   // Initialize saveChanges, isSaving, isSaved using the useSaveChanges hook
-  const { saveChanges, isSaving, isSaved } = useSaveChanges(file, renders);
+  const { saveChanges, isSaving } = useSaveChanges(file, renders);
 
   useEffect(() => {
     const dialogClosed = sessionStorage.getItem('dialogClosed');
