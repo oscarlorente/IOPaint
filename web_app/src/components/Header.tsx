@@ -41,7 +41,7 @@ const Header = (props: HeaderProps) => {
       </div>
       <div className="flex gap-2">
           <Button
-            disabled={isProcessing || isSaving || isSaved || renders.length === 0}
+            disabled={isProcessing || isSaved || renders.length === 0}
             onClick={saveChanges}
           >
             {isSaving ? (
