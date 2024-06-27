@@ -38,7 +38,7 @@ export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProp
         <DialogTitle>{t('editor.instructions.title')}</DialogTitle>
         <DialogDescription>{t('editor.instructions.description')}</DialogDescription>
         <video
-          src="https://floorfymdpd.s3.eu-west-1.amazonaws.com/global/videos/videocallLaptop_video.webm"
+          src="https://floorfymdpd.s3.eu-west-1.amazonaws.com/global/videos/photoEraser_video.webm"
           autoPlay
           loop
           muted
