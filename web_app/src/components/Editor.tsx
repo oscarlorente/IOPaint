@@ -95,7 +95,6 @@ export default function Editor(props: EditorProps) {
   const [showBrush, setShowBrush] = useState(false)
   const [showRefBrush, setShowRefBrush] = useState(false)
   const [isPanning, setIsPanning] = useState<boolean>(false)
-  const [isSaving] = useState<boolean>(false)
   const [scale, setScale] = useState<number>(1)
   const [minScale, setMinScale] = useState<number>(1.0)
   // const [prevScale, setPrevScale] = useState<number>(1.0)
@@ -703,20 +702,20 @@ export default function Editor(props: EditorProps) {
           value={[baseBrushSize]}
           onValueChange={(vals) => handleSliderChange(vals[0])}
           onClick={() => setShowRefBrush(false)}
-          disabled={isProcessing || isSaving}
+          disabled={isProcessing}
         />
         <div className="flex gap-2">
           <IconButton
             tooltip={t('editor.undo')}
             onClick={handleUndo}
-            disabled={undoDisabled || isProcessing || isSaving}
+            disabled={undoDisabled || isProcessing}
           >
             <Undo />
           </IconButton>
           <IconButton
             tooltip={t('editor.redo')}
             onClick={handleRedo}
-            disabled={redoDisabled}
+            disabled={redoDisabled || isProcessing}
           >
             <Redo />
           </IconButton>
@@ -724,7 +723,7 @@ export default function Editor(props: EditorProps) {
           <IconButton
             tooltip={t('editor.showOriginalImage')}
             onPointerDown={(ev) => {
-              if (!(renders.length === 0 || isProcessing || isSaving)) {
+              if (!(renders.length === 0 || isProcessing)) {
                 ev.preventDefault()
                 setShowOriginal(true)
               }
@@ -732,7 +731,7 @@ export default function Editor(props: EditorProps) {
             onPointerUp={() => {
               setShowOriginal(false)
             }}
-            disabled={renders.length === 0 || isProcessing || isSaving}
+            disabled={renders.length === 0 || isProcessing}
           >
             <Eye />
           </IconButton>
@@ -740,7 +739,7 @@ export default function Editor(props: EditorProps) {
           <Button
             variant="outline"
             disabled={
-              isProcessing || isSaving || (!hadDrawSomething() && extraMasks.length === 0)
+              isProcessing || (!hadDrawSomething() && extraMasks.length === 0)
             }
             onClick={() => {
               runInpainting()
