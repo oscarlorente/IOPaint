@@ -700,7 +700,7 @@ export const useStore = createWithEqualityFn<AppState & AppAction>()(
 
       getIsProcessing: (): boolean => {
         return (
-          get().isInpainting || get().isPluginRunning || get().isAdjustingMask
+          get().isInpainting || get().isPluginRunning || get().isAdjustingMask || get().isSaving
         )
       },
 
