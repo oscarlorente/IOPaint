@@ -1,11 +1,13 @@
+@import url("http://prod.hw-ff-cdn.com/fonts/Red_Hat_Display/red_hat_display_font.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html { font-family: "Inter", "system-ui"; overflow: hidden; }
+
+html { font-family: "Red Hat Display", "system-ui"; overflow: hidden; }
 
 @supports (font-variation-settings: normal) {
-  html { font-family: "Inter var", "system-ui"; }
+  html { font-family: "Red Hat Display", "system-ui"; }
 }
 
 .react-transform-wrapper {

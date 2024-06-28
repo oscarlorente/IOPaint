@@ -29,7 +29,7 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({ label, checked, onCheckedCh
               <CheckIcon />
             </Checkbox.Indicator>
           </Checkbox.Root>
-          <label className="pl-[15px] text-[15px] leading-none text-white" htmlFor="c1">
+          <label className="pl-[8px] text-[15px] text-white" htmlFor="c1">
             {t(label)}
           </label>
         </div>
