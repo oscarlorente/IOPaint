@@ -16,7 +16,8 @@ import {
   mouseXY,
   srcToFile,
 } from "@/lib/utils"
-import { Eraser, Eye, Redo, Undo } from "lucide-react"
+import { Eye } from "lucide-react"
+import { EraserIcon, RedoIcon, UndoIcon } from '@/components/CustomIcons';
 import { useImage } from "@/hooks/useImage"
 import { Slider } from "./ui/slider"
 import { PluginName } from "@/lib/types"
@@ -710,14 +711,14 @@ export default function Editor(props: EditorProps) {
             onClick={handleUndo}
             disabled={undoDisabled || isProcessing}
           >
-            <Undo />
+            <UndoIcon />
           </IconButton>
           <IconButton
             tooltip={t('editor.redo')}
             onClick={handleRedo}
             disabled={redoDisabled || isProcessing}
           >
-            <Redo />
+            <RedoIcon />
           </IconButton>
 
           <IconButton
@@ -745,7 +746,7 @@ export default function Editor(props: EditorProps) {
               runInpainting()
             }}
           >
-            <Eraser size="sm" />
+            <EraserIcon size="sm" />
             {t('editor.erase')}
           </Button>
         
