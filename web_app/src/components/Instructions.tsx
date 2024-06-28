@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Info as InfoIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from './ui/dialog';
 import { IconButton } from './ui/button';
@@ -16,6 +16,14 @@ export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProp
 
   const [isChecked, setIsChecked] = useState(false);
 
+  useEffect(() => {
+    // Check sessionStorage for 'dialogClosed' key
+    const dialogClosed = sessionStorage.getItem('dialogClosed');
+    if (dialogClosed === 'true') {
+      setIsChecked(true);
+    }
+  }, []);
+
   const handleOpenChange = (open: boolean) => {
     if (!open && isChecked) {
       sessionStorage.setItem('dialogClosed', 'true');
@@ -25,6 +33,12 @@ export function Instructions({ isDialogOpen, setIsDialogOpen }: InstructionsProp
 
   const handleCheckboxChange = (checked: boolean) => {
     setIsChecked(checked);
+    // Update sessionStorage based on checkbox state
+    if (checked) {
+      sessionStorage.setItem('dialogClosed', 'true');
+    } else {
+      sessionStorage.removeItem('dialogClosed');
+    }
   };
   
   return (
